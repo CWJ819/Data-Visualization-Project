@@ -1,0 +1,124 @@
+@import './variables.less';
+
+// ========== Global Reset & Base Styles ==========
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: @font-text;
+  background: @bg-deep;
+  color: @text-primary;
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ========== Glass Card ==========
+.glass-card {
+  background: @glass-bg;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid @glass-border;
+  border-radius: @radius-lg;
+  box-shadow: @glass-shadow;
+  transition: @transition-smooth;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: @shadow-lg, @shadow-glow;
+  }
+}
+
+// ========== Accent Button ==========
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: @space-sm;
+  padding: @space-sm @space-lg;
+  background: @accent-gradient;
+  color: #0a1628;
+  border: none;
+  border-radius: @radius-md;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: @transition-smooth;
+  box-shadow: @shadow-md;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: @shadow-lg, @shadow-glow;
+
+    &::before { left: 100%; }
+  }
+}
+
+// ========== Scroll-triggered Animation ==========
+.animate-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========== Gradient Text ==========
+.gradient-text {
+  background: @accent-gradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ========== Scrollbar ==========
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: @accent-gradient;
+  border-radius: 3px;
+}
+
+// ========== Selection ==========
+::selection {
+  background: @accent-1;
+  color: #0a1628;
+}
+
+// ========== Accessibility ==========
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
