@@ -47,7 +47,7 @@ export function getRadarOption(profileData) {
       indicator: radarIndicators,
       center: ['50%', '50%'],
       radius: '65%',
-      axisName: { color: '#8892a4', fontSize: 11 },
+      axisName: { color: '#5892a4', fontSize: 11 },
       shape: 'circle',
       splitNumber: 5,
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
