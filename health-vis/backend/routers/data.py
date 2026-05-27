@@ -39,9 +39,19 @@ def get_profile(date: str):
         "sleepHours": r["sleepHours"], "sleepQuality": r["sleepQuality"],
     }
 
+@router.get("/alldata")
+def get_all_data():
+    df = _load_data()
+    return df.to_dict(orient="records")
+
+
 
 def _load_data():
     csv_path = DATA_DIR / "sample.csv"
     if not csv_path.exists():
         return pd.DataFrame()
-    return pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path)
+    df["calDiff"] = df["calIn"] - df["calOut"]
+    return df 
+
+
