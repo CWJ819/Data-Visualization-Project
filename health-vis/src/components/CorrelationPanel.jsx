@@ -25,7 +25,7 @@ function CorrelationPanel() {
     <div className="glass-panel">
       <div className="panel-title">
         <span className="title-icon">🔬</span> 热量差 vs 体重变化
-        <span style={{ fontSize: '0.75rem', color: '#8892a4', marginLeft: 8 }}>点击数据点查看详情</span>
+        <span style={{ fontSize: '0.75rem', color: '#95a5a6', marginLeft: 8 }}>点击数据点查看详情</span>
       </div>
       <div className="chart-container">
         {option && Object.keys(option).length > 0 ? (
@@ -35,7 +35,7 @@ function CorrelationPanel() {
             onChartReady={onChartReady}
           />
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#8892a4' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#95a5a6' }}>
             暂无数据
           </div>
         )}

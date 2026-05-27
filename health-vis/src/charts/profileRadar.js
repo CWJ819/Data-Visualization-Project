@@ -1,11 +1,8 @@
-// ProfileRadar: multi-dimensional health profile
 export function getRadarOption(profileData) {
   if (!profileData) return {}
 
-  // Normalize each dimension to 0-100 scale for radar comparison
   const norm = (val, min, max) => max === min ? 50 : +((val - min) / (max - min) * 100).toFixed(0)
 
-  // Typical ranges for each metric
   const ranges = {
     weight: [50, 100],
     calIn: [1500, 3000],
@@ -47,23 +44,23 @@ export function getRadarOption(profileData) {
       indicator: radarIndicators,
       center: ['50%', '50%'],
       radius: '65%',
-      axisName: { color: '#5892a4', fontSize: 11 },
+      axisName: { color: '#ffffff', fontSize: 11 },
       shape: 'circle',
       splitNumber: 5,
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
       splitArea: {
         areaStyle: {
-          color: ['rgba(0, 212, 170, 0.05)', 'rgba(0, 180, 216, 0.05)'],
+          color: ['rgba(46, 204, 113, 0.05)', 'rgba(26, 188, 156, 0.05)'],
         },
       },
     },
     series: [{
       type: 'radar',
       data: [{ value: values, name: '当前画像' }],
-      areaStyle: { color: 'rgba(0, 212, 170, 0.2)' },
-      lineStyle: { color: '#00d4aa', width: 2 },
-      itemStyle: { color: '#00d4aa' },
+      areaStyle: { color: '#2959ec60' },
+      lineStyle: { color: '#2959ec', width: 3 },
+      itemStyle: { color: '#2959ec' },
       symbol: 'circle',
       symbolSize: 6,
     }],

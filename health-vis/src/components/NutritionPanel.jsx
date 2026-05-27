@@ -17,7 +17,7 @@ function NutritionPanel() {
         {option && Object.keys(option).length > 0 ? (
           <ReactEChartsCore echarts={echarts} option={option} style={{ height: 380 }} notMerge />
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#8892a4' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#95a5a6' }}>
             暂无数据
           </div>
         )}

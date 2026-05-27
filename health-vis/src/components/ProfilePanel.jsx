@@ -30,13 +30,13 @@ function ProfilePanel() {
     <div className="glass-panel">
       <div className="panel-title">
         <span className="title-icon">🎯</span> 多维画像
-        {selectedDate && <span style={{ fontSize: '0.75rem', color: '#00d4aa', marginLeft: 8 }}>日期: {selectedDate}</span>}
+        {selectedDate && <span style={{ fontSize: '0.75rem', color: '#2ecc71', marginLeft: 8 }}>日期: {selectedDate}</span>}
       </div>
       <div className="chart-container">
         {option ? (
           <ReactEChartsCore echarts={echarts} option={option} style={{ height: 380 }} notMerge />
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#8892a4' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#95a5a6' }}>
             点击散点图数据点查看个体画像
           </div>
         )}

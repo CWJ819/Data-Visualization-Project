@@ -1,60 +1,96 @@
 // ========== HealthVis Design Tokens ==========
-// Inspired by VisualizationProject-NBA premium design system
+// "Nature's Vitality" palette — fresh greens, clear skies, warm sunlight, calm waters
 
 // --- Background Gradients ---
-@bg-deep: linear-gradient(135deg, #0a1628 0%, #0d1f3c 50%, #091420 100%);
-@bg-card: linear-gradient(135deg, rgba(15, 30, 50, 0.7) 0%, rgba(10, 20, 35, 0.85) 100%);
+// 深色星空基调（global.less body → background, App.less .dashboard → background）
+@bg-deep: linear-gradient(135deg, #21458b 0%, #257a92 50%, #1c8753 100%);
+// 卡片背景（当前未引用，为后续扩展预留）
+@bg-card: linear-gradient(135deg, rgba(15, 30, 50, 0.7) 0%, rgba(10, 20, 40, 0.85) 100%);
 
-// --- Accent: Health Green/Cyan ---
-@accent-1: #00d4aa;
+// --- Accent: Emerald & Ocean ---
+// 翡翠绿 — 主强调色（main.jsx ConfigProvider colorPrimary, 折线图/健康指标颜色）
+@accent-1: #2ecc71;
+// 天蓝 — 辅助强调色（次要指标颜色）
 @accent-2: #00b4d8;
-@accent-gradient: linear-gradient(135deg, #00d4aa 0%, #00b4d8 100%);
+// 绿→蓝渐变色（global.less .btn-accent background, .gradient-text background）
+@accent-gradient: linear-gradient(135deg, #2ecc71 0%, #00b4d8 100%);
 
-// --- Warm: Calorie/Weight ---
-@warm-1: #ff6b6b;
-@warm-2: #ffa500;
-@warm-gradient: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+// --- Warm: Sunlight & Energy ---
+// 琥珀黄 — 热量超标/能量指示（热量差正柱、散点图剩余点等）
+@warm-1: #f1c40f;
+// 橙 — 摄入热量线（折线图摄入线颜色）
+@warm-2: #e67e22;
+// 暖色渐变（当前未引用，为后续扩展预留）
+@warm-gradient: linear-gradient(135deg, #f1c40f 0%, #e67e22 100%);
 
-// --- Sleep: Purple/Blue ---
-@sleep-1: #667eea;
-@sleep-2: #764ba2;
-@sleep-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+// --- Sleep: Calm Blue ---
+// 天蓝 — 睡眠相关指标（睡眠柱状等）
+@sleep-1: #3498db;
+// 淡蓝 — 睡眠辅助色
+@sleep-2: #85c1e9;
+// 睡眠渐变（当前未引用，为后续扩展预留）
+@sleep-gradient: linear-gradient(135deg, #3498db 0%, #85c1e9 100%);
 
 // --- Neutrals ---
-@text-primary: #ffffff;
-@text-secondary: #e0e6ed;
-@text-muted: #8892a4;
+// 柔白 — 主要文字（global.less body color, App.less .panel-title color）
+@text-primary: #ecf0f1;
+// 银灰 — 二级文字（当前未引用，但 JSX/chart 中有硬编码使用相近色）
+@text-secondary: #bdc3c7;
+// 灰绿 — 提示文字（当前未引用，但 JSX/chart 中硬编码 #8892a4 等）
+@text-muted: #95a5a6;
 
 // --- Glass Morphism ---
-@glass-bg: rgba(255, 255, 255, 0.06);
-@glass-border: rgba(255, 255, 255, 0.1);
-@glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+// 毛玻璃背景 — 极淡绿色透明（global.less .glass-card background, App.less .glass-panel background）
+@glass-bg: rgba(255, 255, 255, 0.04);
+// 毛玻璃边框 — 微绿边框（global.less .glass-card border, App.less .glass-panel border）
+@glass-border: rgba(46, 204, 113, 0.12);
+// 毛玻璃阴影（global.less .glass-card box-shadow, App.less .glass-panel box-shadow）
+@glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
 // --- Shadows ---
-@shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
-@shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
-@shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
-@shadow-glow: 0 0 24px rgba(0, 212, 170, 0.25);
-@shadow-warm: 0 0 24px rgba(255, 107, 107, 0.25);
+// 小阴影（当前未引用，为后续扩展预留）
+@shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+// 中阴影（global.less .btn-accent box-shadow）
+@shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+// 大阴影（global.less .glass-card:hover + App.less .glass-panel:hover box-shadow）
+@shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+// 绿色辉光 — 悬停发光效果（global.less .glass-card:hover, App.less .glass-panel:hover）
+@shadow-glow: 0 0 24px rgba(46, 204, 113, 0.2);
+// 暖色辉光（当前未引用，为后续扩展预留）
+@shadow-warm: 0 0 24px rgba(241, 196, 15, 0.2);
 
 // --- Border Radius ---
+// 小圆角（当前未引用，为后续扩展预留）
 @radius-sm: 8px;
+// 中圆角（global.less .btn-accent border-radius）
 @radius-md: 12px;
+// 大圆角（global.less .glass-card border-radius, App.less .glass-panel border-radius）
 @radius-lg: 16px;
+// 超大圆角（当前未引用，为后续扩展预留）
 @radius-xl: 24px;
 
 // --- Spacing ---
+// 最小间距（App.less .title-icon margin-right）
 @space-xs: 0.5rem;
+// 小间距（global.less .btn-accent padding & gap）
 @space-sm: 1rem;
+// 中间距（App.less .panel-title margin-bottom）
 @space-md: 1.5rem;
+// 大间距（App.less .dashboard padding + .dashboard-grid gap）
 @space-lg: 2rem;
+// 超大间距（当前未引用，为后续扩展预留）
 @space-xl: 3rem;
 
 // --- Typography ---
+// 正文字体（global.less body font-family）
 @font-text: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+// 标题字体（当前未引用，为后续扩展预留）
 @font-heading: 'Inter', sans-serif;
+// 等宽字体（当前未引用，为后续扩展预留）
 @font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
 // --- Animation ---
+// 快速过渡（当前未引用，为后续扩展预留）
 @transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+// 平滑过渡（global.less .glass-card transition, App.less .glass-panel transition）
 @transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);

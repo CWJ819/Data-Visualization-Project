@@ -20,7 +20,7 @@ function HeatmapPanel() {
         {option ? (
           <ReactEChartsCore echarts={echarts} option={option} style={{ height: 380 }} notMerge />
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#8892a4' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 380, color: '#95a5a6' }}>
             Calculating...
           </div>
         )}

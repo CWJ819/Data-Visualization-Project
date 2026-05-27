@@ -1,4 +1,3 @@
-// SleepCalendar: calendar heatmap + bar chart for sleep
 export function getSleepOption(data) {
   if (!data?.length) return {}
 
@@ -6,25 +5,25 @@ export function getSleepOption(data) {
   const sleepHours = data.map(d => d.sleepHours)
   const sleepQuality = data.map(d => d.sleepQuality)
 
-  // Calendar heatmap data format: [[date, value], ...]
   const calendarData = data.map(d => [d.date, d.sleepQuality])
 
   return {
     tooltip: {
       trigger: 'axis',
       backgroundColor: 'rgba(10, 22, 40, 0.95)',
-      borderColor: 'rgba(102, 126, 234, 0.3)',
+      borderColor: 'rgba(52, 152, 219, 0.3)',
     },
+    color:['#f1c40f'],
     legend: {
       data: ['睡眠时长(h)', '睡眠质量'],
       bottom: 0,
-      textStyle: { color: '#8892a4', fontSize: 12 },
+      textStyle: { color: '#ecf0f1', fontSize: 12 },
     },
-    grid: { top: 10, left: 50, right: 50, bottom: 40 },
+    grid: { top: 10, left: 50, right: 50, bottom: 80 },
     xAxis: {
       type: 'category',
       data: dates,
-      axisLabel: { color: '#8892a4', fontSize: 10, rotate: 45 },
+      axisLabel: { color: '#ecf0f1', fontSize: 10, rotate: 45 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
     },
     yAxis: [
@@ -33,8 +32,8 @@ export function getSleepOption(data) {
         name: '小时',
         min: 0,
         max: 12,
-        nameTextStyle: { color: '#667eea' },
-        axisLabel: { color: '#8892a4' },
+        nameTextStyle: { color: '#3498db' },
+        axisLabel: { color: '#ecf0f1' },
         splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
       },
       {
@@ -42,8 +41,8 @@ export function getSleepOption(data) {
         name: '质量分',
         min: 0,
         max: 10,
-        nameTextStyle: { color: '#764ba2' },
-        axisLabel: { color: '#8892a4' },
+        nameTextStyle: { color: '#85c1e9' },
+        axisLabel: { color: '#ecf0f1' },
         splitLine: { show: false },
       },
     ],
@@ -56,9 +55,9 @@ export function getSleepOption(data) {
         itemStyle: {
           color: (p) => {
             const h = p.data
-            if (h >= 8) return '#00d4aa'  // good sleep
-            if (h >= 6) return '#ffa500'  // fair
-            return '#ff6b6b'              // poor
+            if (h >= 8) return '#2ecc71'
+            if (h >= 6) return '#f1c40f'
+            return '#e74c3c'
           },
           borderRadius: [3, 3, 0, 0],
         },
@@ -69,14 +68,14 @@ export function getSleepOption(data) {
         type: 'line',
         data: sleepQuality,
         yAxisIndex: 1,
-        lineStyle: { color: '#764ba2', width: 2 },
-        itemStyle: { color: '#764ba2' },
+        lineStyle: { color: '#ffffff', width: 2 },
+        itemStyle: { color: '#ffffff' },
         areaStyle: {
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(118, 75, 162, 0.25)' },
-              { offset: 1, color: 'rgba(118, 75, 162, 0.02)' },
+              { offset: 0, color: 'rgba(52, 152, 219, 0.25)' },
+              { offset: 1, color: 'rgba(52, 152, 219, 0.02)' },
             ],
           },
         },

@@ -10,8 +10,10 @@ try {
         theme={{
           algorithm: antdTheme.darkAlgorithm,
           token: {
-            colorPrimary: '#00d4aa',
+            colorPrimary: '#2ecc71',
             colorBgBase: '#0a1628',
+            colorText: '#ecf0f1',
+            colorTextSecondary: '#bdc3c7',
             borderRadius: 8,
             fontFamily: "'Inter', sans-serif",
           },
@@ -22,9 +24,8 @@ try {
     </StrictMode>,
   )
 } catch (e) {
-  // Fallback: render error directly to DOM
   document.getElementById('root').innerHTML = `
-    <div style="color:red;padding:40px;background:#0a1628;min-height:100vh">
+    <div style="color:#f1c40f;padding:40px;background:#0a1628;min-height:100vh">
       <h1>Fatal Error:</h1>
       <pre style="white-space:pre-wrap">${e.message}\n\n${e.stack}</pre>
     </div>`

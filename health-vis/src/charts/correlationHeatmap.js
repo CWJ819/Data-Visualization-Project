@@ -1,4 +1,3 @@
-// CorrelationHeatmap: Pearson correlation matrix
 export function getHeatmapOption({ matrix, labels }) {
   if (!matrix?.length || !labels?.length) return {}
 
@@ -18,38 +17,38 @@ export function getHeatmapOption({ matrix, labels }) {
   return {
     tooltip: {
       backgroundColor: 'rgba(10, 22, 40, 0.95)',
-      borderColor: 'rgba(102, 126, 234, 0.3)',
+      borderColor: 'rgba(52, 152, 219, 0.3)',
       formatter: (p) => {
         const [x, y, v] = p.data
         return `${labelMap[labels[y]]} vs ${labelMap[labels[x]]}<br/>r = <strong>${v.toFixed(3)}</strong>`
       },
     },
-    grid: { top: 5, left: 80, right: 20, bottom: 60 },
+    grid: { top: 5, left: 80, right: 20, bottom: 100 },
     xAxis: {
       type: 'category',
       data: labels.map(l => labelMap[l] || l),
-      axisLabel: { color: '#8892a4', fontSize: 10, rotate: 45 },
+      axisLabel: { color: '#ffffff', fontSize: 10, rotate: 45 },
       position: 'bottom',
     },
     yAxis: {
       type: 'category',
       data: labels.map(l => labelMap[l] || l),
-      axisLabel: { color: '#8892a4', fontSize: 10 },
+      axisLabel: { color: '#ffffff', fontSize: 10 },
     },
     visualMap: {
       min: -1, max: 1,
       calculable: true,
       orient: 'horizontal',
       left: 'center', bottom: 0,
-      inRange: { color: ['#667eea', '#1a2540', '#ff6b6b'] },
-      textStyle: { color: '#8892a4' },
+      inRange: { color: ['#3498db', '#0a1628', '#2ecc71'] },
+      textStyle: { color: '#ffffff' },
     },
     series: [{
       type: 'heatmap',
       data,
-      label: { show: true, color: '#e0e6ed', fontSize: 10 },
+      label: { show: true, color: '#ecf0f1', fontSize: 10 },
       emphasis: {
-        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 212, 170, 0.5)' },
+        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(46, 204, 113, 0.5)' },
       },
     }],
   }

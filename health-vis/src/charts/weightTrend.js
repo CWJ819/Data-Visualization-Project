@@ -1,4 +1,3 @@
-// WeightTrend: dual-axis line(weight) + bar(calDiff)
 export function getWeightTrendOption(data) {
   if (!data?.length) return {}
 
@@ -13,33 +12,34 @@ export function getWeightTrendOption(data) {
       trigger: 'axis',
       axisPointer: { type: 'cross' },
       backgroundColor: 'rgba(10, 22, 40, 0.95)',
-      borderColor: 'rgba(0, 212, 170, 0.3)',
+      borderColor: 'rgba(46, 204, 113, 0.3)',
     },
+    color:['#f1c40f'],
     legend: {
       data: ['体重(kg)', '热量差(kcal)', '摄入', '消耗'],
       bottom: 0,
-      textStyle: { color: '#8892a4', fontSize: 12 },
+      textStyle: { color: '#ecf0f1', fontSize: 12 },
     },
-    grid: { top: 10, left: 50, right: 50, bottom: 40 },
+    grid: { top: 10, left: 50, right: 50, bottom: 80 },
     xAxis: {
       type: 'category',
       data: dates,
-      axisLabel: { color: '#8892a4', fontSize: 10, rotate: 45 },
+      axisLabel: { color: '#ecf0f1', fontSize: 10, rotate: 45 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
     },
     yAxis: [
       {
         type: 'value',
         name: '体重 (kg)',
-        nameTextStyle: { color: '#00d4aa' },
-        axisLabel: { color: '#8892a4' },
+        nameTextStyle: { color: '#2ecc71' },
+        axisLabel: { color: '#ecf0f1' },
         splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
       },
       {
         type: 'value',
         name: '热量差 (kcal)',
-        nameTextStyle: { color: '#ff6b6b' },
-        axisLabel: { color: '#8892a4' },
+        nameTextStyle: { color: '#f1c40f' },
+        axisLabel: { color: '#ffffff' },
         splitLine: { show: false },
       },
     ],
@@ -50,14 +50,14 @@ export function getWeightTrendOption(data) {
         data: weights,
         yAxisIndex: 0,
         smooth: true,
-        lineStyle: { color: '#00d4aa', width: 2.5 },
-        itemStyle: { color: '#00d4aa' },
+        lineStyle: { color: '#2ecc71', width: 2.5 },
+        itemStyle: { color: '#2ecc71' },
         areaStyle: {
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(0, 212, 170, 0.3)' },
-              { offset: 1, color: 'rgba(0, 212, 170, 0.02)' },
+              { offset: 0, color: 'rgba(46, 204, 113, 0.3)' },
+              { offset: 1, color: 'rgba(46, 204, 113, 0.02)' },
             ],
           },
         },
@@ -70,7 +70,7 @@ export function getWeightTrendOption(data) {
         data: calDiffs,
         yAxisIndex: 1,
         itemStyle: {
-          color: (p) => p.data > 0 ? '#ff6b6b' : '#00d4aa',
+          color: (p) => p.data > 0 ? '#f1c40f' : '#2ecc71',
           borderRadius: [2, 2, 0, 0],
         },
         barWidth: '60%',
@@ -80,8 +80,8 @@ export function getWeightTrendOption(data) {
         type: 'line',
         data: calIns,
         yAxisIndex: 1,
-        lineStyle: { color: '#ffa500', width: 1, type: 'dashed' },
-        itemStyle: { color: '#ffa500' },
+        lineStyle: { color: '#e67e22', width: 1, type: 'dashed' },
+        itemStyle: { color: '#e67e22' },
         symbol: 'none',
       },
       {
@@ -89,8 +89,8 @@ export function getWeightTrendOption(data) {
         type: 'line',
         data: calOuts,
         yAxisIndex: 1,
-        lineStyle: { color: '#ff6b6b', width: 1, type: 'dashed' },
-        itemStyle: { color: '#ff6b6b' },
+        lineStyle: { color: '#f1c40f', width: 1, type: 'dashed' },
+        itemStyle: { color: '#f1c40f' },
         symbol: 'none',
       },
     ],

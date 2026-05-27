@@ -1,9 +1,7 @@
-// NutritionStream: stacked area chart for carbs/protein/fat
 export function getNutritionOption(data) {
   if (!data?.length) return {}
 
   const dates = data.map(d => d.date)
-  // Calculate percentage of total calories
   const carbsPct = data.map(d => +((d.carbs * 4) / d.calIn * 100).toFixed(1))
   const proteinPct = data.map(d => +((d.protein * 4) / d.calIn * 100).toFixed(1))
   const fatPct = data.map(d => +((d.fat * 9) / d.calIn * 100).toFixed(1))
@@ -25,13 +23,13 @@ export function getNutritionOption(data) {
     legend: {
       data: ['碳水%', '蛋白质%', '脂肪%'],
       bottom: 0,
-      textStyle: { color: '#8892a4', fontSize: 12 },
+      textStyle: { color: '#ffffff', fontSize: 12 },
     },
-    grid: { top: 10, left: 50, right: 20, bottom: 40 },
+    grid: { top: 10, left: 50, right: 20, bottom: 80 },
     xAxis: {
       type: 'category',
       data: dates,
-      axisLabel: { color: '#8892a4', fontSize: 10, rotate: 45 },
+      axisLabel: { color: '#ffffff', fontSize: 10, rotate: 45 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
     },
     yAxis: {
@@ -39,12 +37,12 @@ export function getNutritionOption(data) {
       name: '占比 (%)',
       max: 100,
       nameTextStyle: { color: '#00b4d8' },
-      axisLabel: { color: '#8892a4' },
+      axisLabel: { color: '#ffffff' },
       splitLine: {
         lineStyle: { color: 'rgba(255,255,255,0.05)', type: 'dashed' },
       },
     },
-    color: ['#00d4aa', '#00b4d8', '#667eea'],
+    color: ['#f1c40f', '#2ecc71', '#62b5ec'],
     series: [
       {
         name: '碳水%',
