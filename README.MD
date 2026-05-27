@@ -9,7 +9,7 @@ cd health-vis/backend
 python3 app.py
 ~~~
 
-2. terminal  -- frontend
+2. terminal 2 -- frontend
 
 ~~~
 cd health-vis
