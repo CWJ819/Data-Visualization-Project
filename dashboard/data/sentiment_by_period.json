@@ -1,0 +1,51 @@
+{
+  "by_period": [
+    {
+      "period": "盛唐",
+      "sentiment_score": 0.1555,
+      "poem_count": 6798,
+      "tang_score": 0.1555,
+      "song_score": null,
+      "llm_sentiment_score": -0.1148,
+      "llm_coverage": 209
+    },
+    {
+      "period": "中唐",
+      "sentiment_score": 0.1151,
+      "poem_count": 15299,
+      "tang_score": 0.1151,
+      "song_score": null,
+      "llm_sentiment_score": -0.2903,
+      "llm_coverage": 93
+    },
+    {
+      "period": "晚唐五代",
+      "sentiment_score": 0.1138,
+      "poem_count": 12500,
+      "tang_score": 0.1138,
+      "song_score": null,
+      "llm_sentiment_score": -0.6714,
+      "llm_coverage": 70
+    },
+    {
+      "period": "北宋",
+      "sentiment_score": 0.1965,
+      "poem_count": 3340,
+      "tang_score": null,
+      "song_score": 0.1965,
+      "llm_sentiment_score": -0.6471,
+      "llm_coverage": 102
+    },
+    {
+      "period": "南宋",
+      "sentiment_score": 0.1717,
+      "poem_count": 5367,
+      "tang_score": null,
+      "song_score": 0.1717,
+      "llm_sentiment_score": -0.729,
+      "llm_coverage": 107
+    }
+  ],
+  "method": "lexicon-based + llm（双轨）",
+  "description": "sentiment_score=词典法全量；llm_sentiment_score=LLM精标（1积极/0中性/-1消极）均值，仅覆盖名篇"
+}

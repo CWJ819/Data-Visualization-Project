@@ -1,24 +1,28 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# ── 大型语料与管道产物（不推，本地保留）──────────────
+dataset/
+pipeline/output/
 
-node_modules
-dist
-dist-ssr
-*.local
+# ── 前端构建产物 ──────────────────────────────────────
+dashboard/web/node_modules/
+dashboard/web/dist/
+dashboard/web/.vite/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# dashboard/web/public/data/ 是 dashboard/data/ 的拷贝，运行 setup 时再复制
+dashboard/web/public/data/
+
+# ── Python ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ── 编辑器 / 系统 ────────────────────────────────────
+.vscode/settings.json
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+*.swp
+
+# ── 敏感信息 ─────────────────────────────────────────
+.env
+.env.local

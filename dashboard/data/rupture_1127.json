@@ -1,0 +1,290 @@
+{
+  "rupture": "靖康之变",
+  "year": 1127,
+  "before_period": "北宋",
+  "after_period": "南宋",
+  "before": {
+    "n": 3340,
+    "sentiment": 0.1965,
+    "macro_per_1k": 34.34,
+    "private_per_1k": 60.61,
+    "externality_index": 0.567
+  },
+  "after": {
+    "n": 5367,
+    "sentiment": 0.1717,
+    "macro_per_1k": 38.39,
+    "private_per_1k": 52.29,
+    "externality_index": 0.734
+  },
+  "sentiment_delta": -0.0248,
+  "rising_words": [
+    {
+      "word": "西风",
+      "delta": 0.54
+    },
+    {
+      "word": "东风",
+      "delta": 0.53
+    },
+    {
+      "word": "万里",
+      "delta": 0.5
+    },
+    {
+      "word": "外",
+      "delta": 0.45
+    },
+    {
+      "word": "人间",
+      "delta": 0.44
+    },
+    {
+      "word": "事",
+      "delta": 0.41
+    },
+    {
+      "word": "一笑",
+      "delta": 0.4
+    },
+    {
+      "word": "梅花",
+      "delta": 0.39
+    },
+    {
+      "word": "老子",
+      "delta": 0.33
+    },
+    {
+      "word": "冷",
+      "delta": 0.32
+    },
+    {
+      "word": "客",
+      "delta": 0.32
+    },
+    {
+      "word": "一片",
+      "delta": 0.3
+    },
+    {
+      "word": "是",
+      "delta": 0.28
+    },
+    {
+      "word": "许",
+      "delta": 0.28
+    },
+    {
+      "word": "如此",
+      "delta": 0.28
+    }
+  ],
+  "falling_words": [
+    {
+      "word": "时",
+      "delta": -0.74
+    },
+    {
+      "word": "见",
+      "delta": -0.59
+    },
+    {
+      "word": "人",
+      "delta": -0.57
+    },
+    {
+      "word": "尊前",
+      "delta": -0.51
+    },
+    {
+      "word": "面",
+      "delta": -0.5
+    },
+    {
+      "word": "多情",
+      "delta": -0.46
+    },
+    {
+      "word": "断",
+      "delta": -0.46
+    },
+    {
+      "word": "浅",
+      "delta": -0.46
+    },
+    {
+      "word": "相逢",
+      "delta": -0.4
+    },
+    {
+      "word": "道",
+      "delta": -0.39
+    },
+    {
+      "word": "今夜",
+      "delta": -0.37
+    },
+    {
+      "word": "尽",
+      "delta": -0.37
+    },
+    {
+      "word": "意",
+      "delta": -0.36
+    },
+    {
+      "word": "处",
+      "delta": -0.36
+    },
+    {
+      "word": "佳人",
+      "delta": -0.36
+    }
+  ],
+  "curated_stars": [
+    {
+      "id": "ci_fbf41329cfe8",
+      "title": "菩萨蛮",
+      "author": "辛弃疾",
+      "period": "南宋",
+      "key_line": "郁孤台下清江水。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "思乡"
+      ]
+    },
+    {
+      "id": "ci_1676af9d9416",
+      "title": "破阵子",
+      "author": "辛弃疾",
+      "period": "南宋",
+      "key_line": "醉里挑灯看剑，梦回吹角连营。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "豪迈",
+        "家国"
+      ]
+    },
+    {
+      "id": "ci_8d0d8e31a3aa",
+      "title": "永遇乐",
+      "author": "辛弃疾",
+      "period": "南宋",
+      "key_line": "千古江山，英雄无觅，孙仲谋处。",
+      "polarity_llm": "积极",
+      "types_llm": [
+        "豪迈",
+        "家国"
+      ]
+    },
+    {
+      "id": "ci_8f3702dd5b01",
+      "title": "南乡子",
+      "author": "辛弃疾",
+      "period": "南宋",
+      "key_line": "何处望神州。",
+      "polarity_llm": "积极",
+      "types_llm": [
+        "豪迈",
+        "家国"
+      ]
+    },
+    {
+      "id": "ci_fca11f522444",
+      "title": "菩萨蛮",
+      "author": "李清照",
+      "period": "南宋",
+      "key_line": "风柔日薄春犹早。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "思乡"
+      ]
+    },
+    {
+      "id": "ci_6b4706380f3b",
+      "title": "永遇乐",
+      "author": "李清照",
+      "period": "南宋",
+      "key_line": "落日熔金，暮云合璧，人在何处。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "思乡"
+      ]
+    },
+    {
+      "id": "ci_c3034bf9c54c",
+      "title": "武陵春",
+      "author": "李清照",
+      "period": "南宋",
+      "key_line": "风住尘香花已尽，日晚倦梳头。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "离愁"
+      ]
+    },
+    {
+      "id": "ci_5dea062b42ac",
+      "title": "声声慢",
+      "author": "李清照",
+      "period": "南宋",
+      "key_line": "寻寻觅觅，冷冷清清，凄凄惨惨戚戚。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "离愁",
+        "孤独"
+      ]
+    },
+    {
+      "id": "ci_630045d45669",
+      "title": "贺新郎",
+      "author": "张元干",
+      "period": "南宋",
+      "key_line": "梦绕神州路。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "离愁"
+      ]
+    },
+    {
+      "id": "ci_48c62391aaf7",
+      "title": "满江红",
+      "author": "岳飞",
+      "period": "南宋",
+      "key_line": "怒发冲冠，凭阑处、潇潇雨歇。",
+      "polarity_llm": "积极",
+      "types_llm": [
+        "豪迈",
+        "家国"
+      ]
+    },
+    {
+      "id": "ci_6173c8e846ab",
+      "title": "卜算子",
+      "author": "陆游",
+      "period": "南宋",
+      "key_line": "驿外断桥边，寂寞开无主。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "孤独",
+        "哲思"
+      ]
+    },
+    {
+      "id": "ci_ba6250b56d57",
+      "title": "诉衷情",
+      "author": "陆游",
+      "period": "南宋",
+      "key_line": "当年万里觅封侯。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "孤独"
+      ]
+    }
+  ],
+  "description": "靖康之变（1127）断面：北宋 vs 南宋"
+}

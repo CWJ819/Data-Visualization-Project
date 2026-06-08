@@ -1,0 +1,300 @@
+{
+  "rupture": "安史之乱",
+  "year": 755,
+  "before_period": "盛唐",
+  "after_period": "中唐",
+  "before": {
+    "n": 6798,
+    "sentiment": 0.1555,
+    "macro_per_1k": 59.4,
+    "private_per_1k": 33.13,
+    "externality_index": 1.793
+  },
+  "after": {
+    "n": 15299,
+    "sentiment": 0.1151,
+    "macro_per_1k": 46.36,
+    "private_per_1k": 36.81,
+    "externality_index": 1.259
+  },
+  "sentiment_delta": -0.0404,
+  "rising_words": [
+    {
+      "word": "行",
+      "delta": 0.69
+    },
+    {
+      "word": "声",
+      "delta": 0.69
+    },
+    {
+      "word": "身",
+      "delta": 0.6
+    },
+    {
+      "word": "处",
+      "delta": 0.6
+    },
+    {
+      "word": "中",
+      "delta": 0.49
+    },
+    {
+      "word": "时",
+      "delta": 0.46
+    },
+    {
+      "word": "生",
+      "delta": 0.44
+    },
+    {
+      "word": "事",
+      "delta": 0.42
+    },
+    {
+      "word": "何处",
+      "delta": 0.39
+    },
+    {
+      "word": "人间",
+      "delta": 0.39
+    },
+    {
+      "word": "知",
+      "delta": 0.33
+    },
+    {
+      "word": "路",
+      "delta": 0.33
+    },
+    {
+      "word": "后",
+      "delta": 0.33
+    },
+    {
+      "word": "今朝",
+      "delta": 0.31
+    },
+    {
+      "word": "期",
+      "delta": 0.31
+    }
+  ],
+  "falling_words": [
+    {
+      "word": "子",
+      "delta": -0.62
+    },
+    {
+      "word": "台",
+      "delta": -0.58
+    },
+    {
+      "word": "月",
+      "delta": -0.55
+    },
+    {
+      "word": "飞",
+      "delta": -0.42
+    },
+    {
+      "word": "道",
+      "delta": -0.4
+    },
+    {
+      "word": "里",
+      "delta": -0.4
+    },
+    {
+      "word": "开",
+      "delta": -0.36
+    },
+    {
+      "word": "来",
+      "delta": -0.35
+    },
+    {
+      "word": "流",
+      "delta": -0.35
+    },
+    {
+      "word": "君不",
+      "delta": -0.33
+    },
+    {
+      "word": "川",
+      "delta": -0.32
+    },
+    {
+      "word": "国",
+      "delta": -0.3
+    },
+    {
+      "word": "海",
+      "delta": -0.3
+    },
+    {
+      "word": "马",
+      "delta": -0.27
+    },
+    {
+      "word": "归",
+      "delta": -0.27
+    }
+  ],
+  "curated_stars": [
+    {
+      "id": "f3c09e9e-e471-4489-9d3f-a598832ac638",
+      "title": "悲陈陶",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "孟冬十郡良家子，血作陳陶澤中水。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国"
+      ]
+    },
+    {
+      "id": "8474f5c4-d18e-4b42-9702-19ad909b9ea2",
+      "title": "哀江头",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "少陵野老吞聲哭，春日潛行曲江曲。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "离愁"
+      ]
+    },
+    {
+      "id": "a335f6c4-e9df-47d5-879d-9ebd3c1baf5c",
+      "title": "北征",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "皇帝二載秋，閏八月初吉。",
+      "polarity_llm": "中性",
+      "types_llm": [
+        "家国",
+        "哲思"
+      ]
+    },
+    {
+      "id": "872fd5bd-c6d8-4aef-bc03-85ac1550b561",
+      "title": "羌村 一",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "崢嶸赤雲西，日脚下平地。",
+      "polarity_llm": "中性",
+      "types_llm": [
+        "家国",
+        "离愁"
+      ]
+    },
+    {
+      "id": "01751db4-8ba6-43f9-a89f-4d96826f5ee1",
+      "title": "新安吏",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "客行新安道，喧呼聞點兵。",
+      "polarity_llm": "中性",
+      "types_llm": [
+        "家国",
+        "离愁"
+      ]
+    },
+    {
+      "id": "19c2a99b-507a-415a-8e66-1477861f5d71",
+      "title": "潼关吏",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "士卒何草草，築城潼關道。",
+      "polarity_llm": "中性",
+      "types_llm": [
+        "家国"
+      ]
+    },
+    {
+      "id": "ef36b613-c482-4e50-81fa-68436392346e",
+      "title": "石壕吏",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "暮投石壕邨，有吏夜捉人。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国"
+      ]
+    },
+    {
+      "id": "895139ab-9cc7-4fb5-b43a-89416b18a4dc",
+      "title": "新婚别",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "兔絲附蓬麻，引蔓故不長。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "离愁",
+        "家国"
+      ]
+    },
+    {
+      "id": "b0435860-95e5-44e7-bf6c-9eeee324ce96",
+      "title": "垂老别",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "四郊未寧靜，垂老不得安。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "孤独"
+      ]
+    },
+    {
+      "id": "45f29798-b17d-44ed-b4c2-01620eae4868",
+      "title": "无家别",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "寂寞天寶後，園廬但蒿藜。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "孤独"
+      ]
+    },
+    {
+      "id": "59c7eaa9-3c05-4857-8cff-10376706ccb9",
+      "title": "月夜",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "今夜鄜州月，閨中只獨看。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "离愁",
+        "思乡"
+      ]
+    },
+    {
+      "id": "e9e6425c-6c14-4f69-8694-87a8b96a43de",
+      "title": "春望",
+      "author": "杜甫",
+      "period": "盛唐",
+      "key_line": "國破山河在，城春草木深。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国",
+        "孤独"
+      ]
+    },
+    {
+      "id": "8d6a0fe6-6ba6-46e7-b9ec-a946e34f4451",
+      "title": "菩提寺禁裴迪来相看说逆贼等凝碧池上作音乐供奉人等举声便一时泪下私成口号诵示裴迪",
+      "author": "王维",
+      "period": "盛唐",
+      "key_line": "萬戶傷心生野煙，百僚何日更朝天。",
+      "polarity_llm": "消极",
+      "types_llm": [
+        "家国"
+      ]
+    }
+  ],
+  "description": "安史之乱（755）断面：盛唐 vs 中唐"
+}
