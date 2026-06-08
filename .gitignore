@@ -14,7 +14,6 @@ dashboard/web/node_modules/
 dashboard/web/dist/
 dashboard/web/.vite/
 
-# dashboard/web/public/data/ 是 dashboard/data/ 的拷贝，运行 setup 时再复制
 dashboard/data/
 
 # ── Python ──────────────────────────────────────────
