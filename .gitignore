@@ -1,6 +1,13 @@
 # ── 大型语料与管道产物（不推，本地保留）──────────────
 dataset/
 pipeline/output/
+pipeline/_legacy/
+
+# 本地记忆文件
+memory/
+AGENTS.md
+CLAUDE.md
+requiremets.md
 
 # ── 前端构建产物 ──────────────────────────────────────
 dashboard/web/node_modules/
@@ -8,7 +15,7 @@ dashboard/web/dist/
 dashboard/web/.vite/
 
 # dashboard/web/public/data/ 是 dashboard/data/ 的拷贝，运行 setup 时再复制
-dashboard/web/public/data/
+dashboard/data/
 
 # ── Python ──────────────────────────────────────────
 __pycache__/
@@ -26,3 +33,5 @@ Thumbs.db
 # ── 敏感信息 ─────────────────────────────────────────
 .env
 .env.local
+
+

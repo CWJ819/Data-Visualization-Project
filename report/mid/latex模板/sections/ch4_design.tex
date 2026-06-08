@@ -1,0 +1,59 @@
+\section{设计方案}
+
+\subsection{设计需求}
+
+围绕核心问题，系统需满足：
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=0.25em]
+    \item \textbf{叙事性}：以时间长河为骨架，把情感、意象、体裁、地理、词汇组织成一条可被引导阅读的故事线。
+    \item \textbf{多视图协调}：各视图共享同一时期语义，支持 brushing \& linking——选定一个时期，其余视图同步聚焦。
+    \item \textbf{细节按需展开}：宏观指标可下钻到具体诗作，保证代理指标可追溯回原文。
+    \item \textbf{对比性}：支持“唐 vs 宋词”纵向并置，以及两大断裂前后的断面对照。
+    \item \textbf{数据诚实}：低置信 / 未定年数据在视觉上弱化或单列，不冒充事实。
+\end{enumerate}
+
+\subsection{视觉隐喻：时间长河上的“流”与“繁星”}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l l l}
+\toprule
+隐喻 & 数据层 & 视觉角色 \\
+\midrule
+流（普通作品汇聚成时代面貌） & 全集按时期聚合 & 连续成势的底层河水 \\
+繁星（最具代表性的名篇） & 三百首名篇逐首 & 河面上可点击下钻的星 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent 两道红色“断裂带”（755、1127）横切长河，标记安史之乱与靖康之变。
+
+\subsection{技术栈}
+
+\textbf{React + Vite + ECharts}（前端，纯静态数据，无后端）。理由：规划的图表（themeRiver、地图、词云、堆叠面积、关系图）
+几乎都是 ECharts 原生类型，开箱即用；数据已是静态 JSON，\texttt{fetch} 即用、可构建为静态包演示；组件化便于三人并行开发。
+
+\subsection{六屏叙事结构}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{c l l l}
+\toprule
+屏 & 主题 & 主图 & 交互 \\
+\midrule
+S1 & 历史时间轴 + 情感温度计 & 折线 + 事件带 & 拖时间轴联动 \\
+S2 & 意象的生死流转（核心） & 意象河流图 + 外内比 & 点选意象高亮 \\
+S3 & 诗体的新陈代谢 & 堆叠面积 & hover 看明细 \\
+S4 & 地域空间（Poetry GIS） & 地图 + 散点/热力 & 切时期看版图 \\
+S5 & 唐诗 vs 宋词 & 双色对比词云 & 点词下钻例句 \\
+S6 & 两大断裂断面 & 前后对照 + 升降词 & 切换 755 / 1127 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{多视图协调}
+
+S1 的时间轴是全局“指挥棒”：选定时期后，S2 河流聚焦该时段、S3 体裁高亮对应列、S4 地图切到该时期版图，
+实现视图间真正联动而非各自独立——这是评分中“多视图协调与交互”的核心着力点。

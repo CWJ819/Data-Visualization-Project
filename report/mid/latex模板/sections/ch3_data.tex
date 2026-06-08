@@ -1,0 +1,85 @@
+\section{数据说明}
+
+\subsection{数据来源}
+
+语料取自开源的 \textit{chinese-poetry} 数据集。
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l l c r}
+\toprule
+语料 & 文件 & 字形 & 规模 \\
+\midrule
+全唐诗 & \texttt{poet.tang.*.json} & 繁体 & 57\,599 首 \\
+宋词（全宋，含南宋） & \texttt{ci.song.*.json} & 简体 & 21\,049 首 \\
+唐作者元数据 & \texttt{authors.tang.json} & 繁体 & 3\,663 人 \\
+宋词作者元数据 & \texttt{author.song.json} & 简体 & 1\,529 人 \\
+名篇选集 & 唐诗三百首(366)、宋词三百首(280) & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{不使用}：\texttt{poet.song.*}（是宋诗，非宋词）、\texttt{authors.song.json}（宋诗作者）。
+
+\subsection{两个地基性事实（决定了整套处理）}
+
+\begin{findbox}[事实一：繁简割裂]
+唐诗为\textbf{繁体}、宋词为\textbf{简体}（实测唐诗繁/简 $\approx$ 5554/30，宋词 $\approx$ 0/7304）。
+若不统一，词频/意象的“唐宋对比”会把\textbf{繁简差异误当时代差异}。
+\end{findbox}
+
+\begin{findbox}[事实二：逐首创作年不可恢复]
+唐 3663 位作者中能从传记解析真实生卒年者极少；逐首诗的精确创作年学界亦常存争议。
+故\textbf{时间轴只能到“时期”粒度}，不伪造逐年数据。
+\end{findbox}
+
+\subsection{确定性处理管道}
+
+管道 \texttt{ingest $\to$ metrics $\to$ qa}（详见 \texttt{pipeline/README.md}），完全确定性、可复现、不依赖大模型。
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=0.3em]
+    \item \textbf{繁简归一}：作者名与正文统一经 OpenCC 繁$\to$简，统计基于简体文本，保留原文供展示。
+    \item \textbf{定年阶梯}（不伪造年份）：唐——“诗人$\to$时期”查表（高置信）$\to$ 作者传记年号推时期（中置信）$\to$ 否则“未定年”；
+          宋词——“宋词人$\to$北宋/南宋”查表 $\to$ 传记生年阈值 1085 $\to$ 否则“未定年”。未定年不进时间轴，但仍进唐宋对比、词频、意象聚合。
+    \item \textbf{去重、空正文过滤、稳定 ID}（词无 ID 用内容哈希生成）。
+    \item \textbf{名气标记}：是否入选三百首、是否名家、是否两大断裂亲历名篇。
+\end{enumerate}
+
+\subsection{时期分布（语料 78\,648 首）}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l r @{\hspace{2cm}} l r}
+\toprule
+时期 & 数量 & 定年来源 & 数量 \\
+\midrule
+盛唐 & 8\,870 & 诗人表 & 33\,860 \\
+中唐 & 19\,132 & 传记年号 & 9\,775 \\
+晚唐五代 & 15\,633 & 宋词人表 & 8\,688 \\
+北宋 & 3\,680 & 传记生年 & 3\,047 \\
+南宋 & 8\,055 & 未知（未定年） & 23\,278 \\
+未定年 & 23\,278 & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent 可入时间轴（datable）：\textbf{55\,370 / 78\,648 $\approx$ 70\%}（唐诗 75\%；名家名篇范围接近全可定年）。
+
+\subsection{仪表盘数据契约}
+
+时间轴为有序时期（非年份桶）。所有文件为严格 JSON。主要产物：
+\texttt{meta}、\texttt{sentiment\_by\_period}、\texttt{imagery\_flow}、\texttt{genre\_by\_period}、
+\texttt{word\_freq\_comparison}、\texttt{place\_geo}、\texttt{stars}（繁星=名篇逐首）、
+\texttt{rupture\_755} / \texttt{rupture\_1127}（两大断裂断面）。
+分析范围可切换 \texttt{full}（流）/ \texttt{representative}（名家，叙事默认）/ \texttt{anthology}（三百首）。
+
+\subsection{已知局限}
+
+\begin{itemize}[leftmargin=*, itemsep=0.2em]
+    \item 情感/意象为词典法\textbf{代理指标}，不如人工细读精准，但确定性、可复现，且可下钻原文核对。
+    \item 未定年约 2.3 万首（多为长尾小作者）不进时间轴；时间轴结论主要由名家名篇范围支撑。
+    \item 三百首选集反映后世编选取向，故保留 \texttt{full} 全集范围交叉对照。
+    \item “唐诗 vs 宋词”对比同时含“诗/词体裁”与“时代”两重差异，解读时需说明。
+\end{itemize}

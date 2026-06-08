@@ -1,0 +1,200 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+\documentclass[12pt, a4paper]{ctexart}
+
+%----------------------------------------------------------------------------------------
+%	1. 字体与版面设置
+%----------------------------------------------------------------------------------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setCJKmainfont[AutoFakeBold=true]{SimSun}
+\usepackage{geometry}
+\geometry{left=1.8cm, right=1.8cm, top=2.5cm, bottom=2.5cm, footskip=2cm}
+\usepackage[table]{xcolor}
+
+%----------------------------------------------------------------------------------------
+%	封面背景所需宏包（水印已移除）
+%----------------------------------------------------------------------------------------
+\usepackage{tikz}
+\usepackage{eso-pic}
+
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{enumitem}
+
+%----------------------------------------------------------------------------------------
+%	2. 章节格式定制
+%----------------------------------------------------------------------------------------
+\ctexset{
+    section = {
+        name = {第,章},
+        number = \chinese{section},
+        format = \centering\heiti\zihao{3}\bfseries,
+        aftername = \quad,
+        beforeskip = 1ex,
+        afterskip = 1ex,
+        break = \clearpage
+    },
+    subsection = {
+        number = \thesubsection,
+        format = \heiti\zihao{-3},
+        beforeskip = 0.5ex,
+        afterskip = 0.5ex
+    },
+    subsubsection = {
+        number = \thesubsubsection,
+        format = \heiti\zihao{4},
+        beforeskip = 0ex,
+        afterskip = 0ex
+    },
+    contentsname = {\heiti 目录}
+}
+
+%----------------------------------------------------------------------------------------
+%	3. 工具宏包
+%----------------------------------------------------------------------------------------
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage{float}
+
+% 【要点】高亮框（青色系）
+\newtcolorbox{keybox}[1][]{
+    enhanced,
+    colframe=cyan!70!black,
+    colback=cyan!4!white,
+    fonttitle=\bfseries\sffamily,
+    coltitle=black,
+    title={#1},
+    drop shadow,
+    sharp corners=downhill,
+    breakable
+}
+% 【发现】高亮框（红色系）
+\newtcolorbox{findbox}[1][]{
+    enhanced,
+    colframe=red!65!black,
+    colback=red!4!white,
+    fonttitle=\bfseries\sffamily,
+    coltitle=black,
+    title={#1},
+    drop shadow,
+    sharp corners=downhill,
+    breakable
+}
+
+%----------------------------------------------------------------------------------------
+%	4. 页眉页脚
+%----------------------------------------------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{15pt}
+\lhead{\songti 唐宋诗词的时代回响 · 中期报告}
+\rhead{\leftmark}
+\renewcommand{\headrulewidth}{0.4pt}
+\cfoot{\thepage}
+\renewcommand{\footrule}{
+    \vskip -8pt
+    \begingroup
+        \footnotesize\songti
+        VisProject第2小组中期报告 \hfill 唐宋之变
+    \endgroup
+    \par
+    \vskip 3pt
+    \hrule width\headwidth height 0.4pt
+    \vskip 3pt
+}
+
+%----------------------------------------------------------------------------------------
+%	超链接
+%----------------------------------------------------------------------------------------
+\usepackage[
+    colorlinks=true,
+    linkcolor=cyan!70!black,
+    urlcolor=cyan!70!black,
+    citecolor=cyan!70!black,
+    bookmarksnumbered=true,
+    pdfstartview=FitH,
+    pdftitle={唐宋诗词的时代回响 · 中期报告},
+    pdfauthor={VisProject第2小组}
+]{hyperref}
+
+%======================================================================
+%   文档正文开始
+%======================================================================
+\begin{document}
+
+% --- 封面 ---
+\begin{titlepage}
+    \AddToShipoutPictureBG*{
+        \begin{tikzpicture}[remember picture, overlay]
+            \node[opacity=1, inner sep=0pt] at (current page.center) {
+                \includegraphics[width=\paperwidth, height=\paperheight]{figures/cover3.png}
+            };
+        \end{tikzpicture}
+    }
+
+    \begin{center}
+        \vspace*{1.6cm}
+        \resizebox{0.92\textwidth}{!}{
+        \Huge \heiti \color{black} 唐宋诗词的时代回响} \\[0.9cm]
+        \resizebox{0.88\textwidth}{!}{
+        \huge \color{black} The Echoes of an Age: Tang--Song Poetry across Two Ruptures
+        } \\[1.2cm]
+        {\LARGE \heiti \color{black}
+        以两次大断裂为锚的文本计量可视化} \\[0.6cm]
+        {\large \color{black} 数据可视化导论 \quad 课程项目 VisProject \quad 中期报告}
+        \vfill
+        {\large \heiti \color{black} 组员：\underline{陈维嘉}\ \ \underline{蒋文倩}\ \ \underline{孙嘉泽} \\[0.4cm]}
+        {\normalsize \color{white!85!black} 2026 年 6 月}
+        \vspace*{1.2cm}
+    \end{center}
+\end{titlepage}
+
+%======================================================================
+%   前言页
+%======================================================================
+\newpage
+\thispagestyle{empty}
+\section*{前言}
+
+唐诗与宋词是中国古典文学的两座高峰。本项目以约 7.8 万首唐诗、宋词为素材，借助文本计量与数据可视化，
+考察文学如何回应时代——尤其是\textbf{安史之乱（755）}与\textbf{靖康之变（1127）}两次最剧烈的历史断裂前后，
+文人的情感、意象、词汇与地理书写发生了怎样的变化。
+
+我们刻意不预设"唐外向、宋内向"的单一结论，而让数据自己说话：盛唐的昂扬如何在断裂中沉潜，
+北宋如何转向清雅内省，而靖康之后南宋的豪放又如何回潮。本中期报告记录截至目前的项目背景、分析任务、
+数据处理、可视化设计方案，以及实现进展与下一步计划。
+
+\vspace{1.2cm}
+\begin{flushright}
+    \large \textbf{数据可视化导论 · VisProject 第 2 小组} \\
+    \normalsize 2026 年 6 月
+\end{flushright}
+\newpage
+
+%======================================================================
+%   目录页
+%======================================================================
+\newpage
+\pagestyle{empty}
+\tableofcontents
+\clearpage
+\pagestyle{fancy}
+
+% --- 正文 ---
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\setcounter{section}{0}
+
+\include{sections/ch1_background}
+\include{sections/ch2_tasks}
+\include{sections/ch3_data}
+\include{sections/ch4_design}
+\include{sections/ch5_progress}
+
+\end{document}

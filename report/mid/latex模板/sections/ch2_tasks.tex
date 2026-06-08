@@ -1,0 +1,53 @@
+\section{分析任务定义}
+
+\subsection{核心研究问题}
+
+\begin{keybox}[核心问题]
+中国文人在两次大断裂——安史之乱（755）、靖康之变（1127）——前后，精神世界与文学表达发生了怎样的变化？
+\end{keybox}
+
+这是一个探索性、可被数据验证的主问题，统一收敛到“两次断裂前后的对照”这条主轴。
+
+\subsection{为什么用可视化，而非纯统计 / 机器学习}
+
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, itemsep=0.3em]
+    \item \textbf{问题是阐释性的，而非预测性的}：要回答的不是“分类准确率多高”，而是“精神世界如何随时代迁移”，
+          这类人文结论需专家在历史语境中解读，单一统计量无法概括。
+    \item \textbf{核心是多维度协同的时间叙事}：情感、意象、体裁、地理、词汇需在同一时间轴上同步比对，
+          可视化的多视图协调（brushing \& linking）天然适配。
+    \item \textbf{目标是发现 non-trivial pattern}：探索性分析依赖交互式追问（拖时间轴、点选意象、下钻原诗），
+          正是可视化的 details-on-demand 优势。
+    \item \textbf{指标是代理变量，需可追溯}：情感分、外内比等都是对“精神状态”的近似度量，
+          必须能随时下钻回原诗验证，避免把指标当真相。
+\end{enumerate}
+
+\subsection{六个分析子任务（X 轴 = 五个有序时期）}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c l l}
+\toprule
+编号 & 子任务 & 看什么 / 主图 \\
+\midrule
+T1 & 情感演化 & 盛唐高 $\to$ 中晚唐低徊 $\to$ 北宋回升 $\to$ 南宋再降 / 情感温度计 \\
+T2 & 意象演化（核心） & 外内比=宏/私：唐持续下降、\textbf{南宋回弹} / 意象河流图 \\
+T3 & 体裁演化 & 唐诗体裁 $\to$ 词的兴起 / 堆叠面积图 \\
+T4 & 地理空间 & 塞北西域 $\to$ 江南都市 $\to$ 偏安江南 / 诗歌地图 \\
+T5 & 唐宋词汇对比 & 唐大物象 vs 宋雅物小空间（繁简已统一）/ 双色词云 \\
+T6 & 两大断裂断面 & 755 / 1127 前后对照、升降词、亲历名篇 / 断面专屏 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent T1、T2 为主线；\textbf{T6 两大断裂为戏剧高潮}；T4 为“诗歌地理学（Poetry GIS）”亮点。
+全局叠加“\textbf{流}（全集聚合，显时代面貌）/ \textbf{繁星}（三百首名篇逐首，可点击下钻）”双层。
+
+\subsection{取舍（明确删减，避免发散）}
+
+\begin{itemize}[leftmargin=*, itemsep=0.3em]
+    \item \textbf{删除典故来源热力图}：需古汉语 NER + 古籍知识图谱，工程量巨大且准确率低。
+    \item \textbf{删除 LLM 精确年份推断}：易幻觉；改用“有序时期 + 置信度”。
+    \item \textbf{LLM 降为可选附件}：确定性管道为可信核心，LLM 因一致性问题默认不接入主结论。
+    \item \textbf{有余力再做}：LDA 主题河流、诗人社交网络。
+\end{itemize}
