@@ -16,18 +16,16 @@ cd dashboard/web
 # 2. 安装依赖
 npm install
 
-# 3. 拷贝仪表盘数据到 Vite public 目录
-cp -r ../data public/data          # macOS/Linux
-# Windows PowerShell:
-# Copy-Item -Recurse ..\data public\data
-
-# 4. 启动开发服务器
+# 3. 启动开发服务器（数据已在 public/data/，无需额外拷贝）
 npm run dev
 # → 浏览器打开 http://localhost:5173
 ```
 
-> **注意**：`public/data/` 是 `dashboard/data/` 的拷贝，不进 git。  
-> 若 `dashboard/data/` 有更新（重跑 `pipeline/metrics.py`），重新执行第 3 步即可。
+> 若重跑 `pipeline/metrics.py` 更新了数据，需将新产物拷贝到 `dashboard/web/public/data/`：
+> ```bash
+> cp -r pipeline/output/../dashboard/data/* dashboard/web/public/data/
+> # 或直接重新跑：python pipeline/metrics.py 后把 dashboard/data/ 同步过来
+> ```
 
 ---
 
@@ -51,7 +49,7 @@ dashboard/
     ├── package.json
     ├── vite.config.js
     ├── public/
-    │   ├── data/            # ← 从 ../data/ 手动拷贝（不进 git）
+    │   ├── data/            # 仪表盘 JSON（进 git，直接 fetch 使用）
     │   └── map/china.json   # 中国地图 GeoJSON（DataV，568 KB）
     └── src/
         ├── App.jsx          # 六屏容器 + 顶部导航
