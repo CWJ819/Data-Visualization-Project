@@ -1,19 +1,21 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #0d1117;
-  color: #e6edf3;
-  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(192, 138, 62, 0.12), transparent 28%),
+    linear-gradient(180deg, #f7f1e3 0%, #efe4cf 100%);
+  color: #24342f;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ── 顶部导航 ── */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-  height: 48px; background: rgba(13,17,23,0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #21262d;
-  display: flex; align-items: center; padding: 0 24px; gap: 4px;
+  height: 56px; background: rgba(247, 241, 227, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(74, 61, 42, 0.16);
+  display: flex; align-items: center; padding: 0 28px; gap: 8px;
 }
 
 .nav-title {
