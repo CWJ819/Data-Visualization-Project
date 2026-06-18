@@ -19,8 +19,7 @@ export default function TypeRiver({ data }) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return null
 
-    const MS_PER_YEAR = 365 * 86400 * 1000
-    const seriesData = data.map(d => [PHASE_YEARS[d[0] - 1] * MS_PER_YEAR, d[1], d[2]])
+    const seriesData = data.map(d => [new Date(PHASE_YEARS[d[0] - 1], 6, 15).getTime(), d[1], d[2]])
 
     return {
       backgroundColor: '#f5f2eb',

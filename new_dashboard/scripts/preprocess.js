@@ -73,15 +73,15 @@ function fillMissing(byPhase, allCats) {
 fillMissing(typesByPhase, ALL_TYPES)
 fillMissing(themesByPhase, ALL_THEMES)
 
-// 归一化为百分比
+// 归一化为百分比（各类型/题材在阶段内占比，合计 100%）
 function normalize(byPhase) {
   const result = {}
   for (const [phase, cats] of Object.entries(byPhase)) {
-    const total = poemCountPerPhase[phase]
-    if (!total) continue
+    const sum = Object.values(cats).reduce((a, b) => a + b, 0)
+    if (!sum) continue
     result[phase] = {}
     for (const [cat, count] of Object.entries(cats)) {
-      result[phase][cat] = +(count / total * 100).toFixed(2)
+      result[phase][cat] = +(count / sum * 100).toFixed(2)
     }
   }
   return result
