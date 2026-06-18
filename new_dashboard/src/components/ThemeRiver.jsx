@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import ChartBox from './ChartBox.jsx'
 
 const THEME_COLORS = [
-  '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71',
-  '#1abc9c', '#3498db', '#2980b9', '#8e44ad',
-  '#e84393', '#636e72', '#00b894', '#6c5ce7',
+  '#7f97ae', '#99a5c0', '#cdc8aa', '#e2ced0',
+  '#bfbea8', '#bbcadc', '#e9e1d8', '#e1d6db',
+  '#d4d5cf', '#c6b9a3', '#d7c6d9', '#a6b7a2',
 ]
 
 const PHASE_NAMES = [
@@ -19,26 +19,34 @@ export default function ThemeRiver({ data }) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return null
 
-    const seriesData = data.map(d => {
-      const year = PHASE_YEARS[d[0] - 1]
-      return [String(year), d[1], d[2]]
-    })
+    const MS_PER_YEAR = 365 * 86400 * 1000
+    const seriesData = data.map(d => [PHASE_YEARS[d[0] - 1] * MS_PER_YEAR, d[1], d[2]])
 
     return {
-      backgroundColor: '#161b22',
+      backgroundColor: '#f5f2eb',
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          const name = params.value ? params.value[2] : ''
+          return `<span style="font-weight:600;color:#5a5a5a;font-size:13px;">${name}</span>`
+        },
+        backgroundColor: 'rgba(255,255,255,0.92)',
+        borderColor: '#cdc8aa',
+        textStyle: { color: '#5a5a5a', fontSize: 13 },
+      },
       singleAxis: {
         type: 'time',
-        bottom: 30,
+        bottom: 60,
         axisLabel: {
-          color: '#aaa',
-          fontSize: 11,
+          color: '#7f97ae',
+          fontSize: 9,
+          rotate: -30,
           formatter: (v) => {
-            const dt = new Date(v)
-            const idx = PHASE_YEARS.indexOf(dt.getFullYear())
-            return idx >= 0 ? PHASE_NAMES[idx] : ''
+            const y = new Date(v).getFullYear()
+            const idx = PHASE_YEARS.indexOf(y)
+            return idx >= 0 ? PHASE_NAMES[idx].replace('五代十国', '五代') : ''
           },
           interval: 0,
-          rotate: -25,
         },
       },
       series: [{

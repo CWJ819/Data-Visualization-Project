@@ -1,10 +1,13 @@
 import { useMemo, useRef, useEffect } from 'react'
 import echarts from '../charts.js'
 
+const MORANDI_DARK = [
+  '#7f97ae', '#99a5c0', '#bfbea8', '#a6b7a2',
+  '#c6b9a3', '#8a9bb0', '#b0a898', '#9aa8b8',
+]
+
 function randomColor() {
-  const hues = [0, 20, 200, 220, 240, 300, 340]
-  const h = hues[Math.floor(Math.random() * hues.length)]
-  return `hsl(${h}, 70%, 55%)`
+  return MORANDI_DARK[Math.floor(Math.random() * MORANDI_DARK.length)]
 }
 
 export default function WordCloud({ data }) {
@@ -27,7 +30,7 @@ export default function WordCloud({ data }) {
         shape: 'circle',
         width: '90%',
         height: '90%',
-        sizeRange: [12, 50],
+        sizeRange: [14, 52],
         rotationRange: [-20, 20],
         rotationStep: 20,
         gridSize: 6,

@@ -25,11 +25,14 @@ const lines = readFileSync(inputFile, 'utf-8').trim().split('\n')
 const records = lines.map(l => JSON.parse(l))
 console.log(`读取 ${records.length} 条记录`)
 
-// 第一阶段：原始计数 + 各阶段作品总数
 const typesByPhase = {}
 const themesByPhase = {}
 const imageryByPhase = {}
 const poemCountPerPhase = {}
+
+// 收集全部可能出现的类型和题材
+const ALL_TYPES = new Set()
+const ALL_THEMES = new Set()
 
 for (const r of records) {
   const phase = r['创作阶段']
@@ -38,12 +41,14 @@ for (const r of records) {
   poemCountPerPhase[phase] = (poemCountPerPhase[phase] || 0) + 1
 
   for (const t of r['类型'] || []) {
+    ALL_TYPES.add(t)
     typesByPhase[phase] ??= {}
     typesByPhase[phase][t] = (typesByPhase[phase][t] || 0) + 1
   }
 
   const theme = r['题材_llm']
   if (theme) {
+    ALL_THEMES.add(theme)
     themesByPhase[phase] ??= {}
     themesByPhase[phase][theme] = (themesByPhase[phase][theme] || 0) + 1
   }
@@ -54,7 +59,21 @@ for (const r of records) {
   }
 }
 
-// 第二阶段：归一化为百分比（每种类型/题材在阶段内的出现率）
+// 为每个阶段填补缺失的类型/题材（值为 0），确保河流图连续
+function fillMissing(byPhase, allCats) {
+  for (const phase of Object.keys(byPhase)) {
+    for (const cat of allCats) {
+      if (!(cat in byPhase[phase])) {
+        byPhase[phase][cat] = 0
+      }
+    }
+  }
+}
+
+fillMissing(typesByPhase, ALL_TYPES)
+fillMissing(themesByPhase, ALL_THEMES)
+
+// 归一化为百分比
 function normalize(byPhase) {
   const result = {}
   for (const [phase, cats] of Object.entries(byPhase)) {
@@ -88,8 +107,8 @@ writeFileSync(resolve(OUTPUT_DIR, 'types_by_phase.json'), JSON.stringify(typesRi
 writeFileSync(resolve(OUTPUT_DIR, 'themes_by_phase.json'), JSON.stringify(themesRiver))
 writeFileSync(resolve(OUTPUT_DIR, 'imagery_by_phase.json'), JSON.stringify(imageryByPhase))
 
-console.log(`类型河流图数据: ${typesRiver.length} 行 (已归一化)`)
-console.log(`题材河流图数据: ${themesRiver.length} 行 (已归一化)`)
+console.log(`类型河流图数据: ${typesRiver.length} 行 (${ALL_TYPES.size} 种类型)`)
+console.log(`题材河流图数据: ${themesRiver.length} 行 (${ALL_THEMES.size} 种题材)`)
 console.log(`各阶段作品数:`, Object.fromEntries(
   Object.entries(poemCountPerPhase).sort((a, b) => a[0] - b[0])
 ))
