@@ -7,9 +7,9 @@ const TYPE_COLORS = [
 ]
 
 const PHASE_NAMES = [
-  '盛唐前期', '盛唐后期', '安史之乱', '大历贞元',
-  '元和文坛', '晚唐', '五代十国', '北宋前期',
-  '北宋中期', '北宋晚期', '南渡', '南宋中后期',
+  '盛唐前期', '盛唐后期', '唐易代转折期', '中唐前期',
+  '中唐后期', '晚唐时期', '五代十国', '北宋前期',
+  '北宋中期', '北宋晚期', '宋易代转折期', '南宋中后期',
 ]
 
 // 每个阶段对应一个代表年份（仅用于 ThemeRiver 时间轴定位）
@@ -19,7 +19,7 @@ export default function TypeRiver({ data }) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return null
 
-    const seriesData = data.map(d => [new Date(PHASE_YEARS[d[0] - 1], 6, 15).getTime(), d[1], d[2]])
+    const seriesData = data.map(d => [d[0], d[1], d[2]])
 
     return {
       backgroundColor: '#f5f2eb',
@@ -34,18 +34,19 @@ export default function TypeRiver({ data }) {
         textStyle: { color: '#5a5a5a', fontSize: 13 },
       },
       singleAxis: {
-        type: 'time',
+        type: 'value',
+        min: 1,
+        max: 12,
+        interval: 1,
         bottom: 60,
         axisLabel: {
           color: '#7f97ae',
           fontSize: 9,
           rotate: -30,
           formatter: (v) => {
-            const y = new Date(v).getFullYear()
-            const idx = PHASE_YEARS.indexOf(y)
-            return idx >= 0 ? PHASE_NAMES[idx].replace('五代十国', '五代') : ''
+            const idx = Math.round(v) - 1
+            return idx >= 0 && idx < PHASE_NAMES.length ? PHASE_NAMES[idx] : ''
           },
-          interval: 0,
         },
       },
       series: [{
