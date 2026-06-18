@@ -1,9 +1,9 @@
 # ── 大型语料与管道产物（不推，本地保留）──────────────
 dataset/
-pipeline/output/
 pipeline/_legacy/
 
 # 本地记忆文件
+.claude/
 memory/
 AGENTS.md
 CLAUDE.md
