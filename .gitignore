@@ -14,6 +14,10 @@ dashboard/web/node_modules/
 dashboard/web/dist/
 dashboard/web/.vite/
 
+new_dashboard/node_modules/
+new_dashboard/dist/
+new_dashboard/.vite/
+
 dashboard/data/
 
 # ── Python ──────────────────────────────────────────

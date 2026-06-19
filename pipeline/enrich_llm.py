@@ -36,11 +36,12 @@ from pipeline import config as C
 
 API_URL = "https://api.deepseek.com/v1/chat/completions"
 MODEL   = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash")
-BATCH       = int(os.environ.get("DEEPSEEK_BATCH", "20"))
-MAX_WORKERS = int(os.environ.get("DEEPSEEK_WORKERS", "10"))
+BATCH       = int(os.environ.get("DEEPSEEK_BATCH", "32"))
+MAX_WORKERS = int(os.environ.get("DEEPSEEK_WORKERS", "16"))
 MAX_TOKENS  = int(os.environ.get("DEEPSEEK_MAX_TOKENS", "8192"))
 MAX_RETRIES = 3
-API_TIMEOUT = int(os.environ.get("DEEPSEEK_TIMEOUT", "60"))
+API_TIMEOUT = int(os.environ.get("DEEPSEEK_TIMEOUT", "120"))
+CHECKPOINT_EVERY = int(os.environ.get("DEEPSEEK_CHECKPOINT_EVERY", "20"))
 PROGRESS_EVERY = max(1, int(os.environ.get("DEEPSEEK_PROGRESS_EVERY", "5")))
 
 # 极性 → 数值映射（供 metrics.py 共用）
@@ -59,59 +60,37 @@ STAGE_BINS = C.TIME_STAGE_BINS
 STAGE_ORDER = C.PERIOD_ORDER
 UNKNOWN_STAGE = C.UNKNOWN_PERIOD
 
-PROMPT = """你是中国古典诗词数字人文项目的文本标注员。请对输入数组中的每首作品独立标注。
-只能依据输入中的 id、题目、作者、朝代、时期、体裁、词牌、断裂标签、正文；不要编造正文内容或具体创作年份。
+PROMPT = """你是中国古典诗词文本标注员。请对输入数组中的每首诗词独立标注，只依据输入中的题目、作者、朝代、时期、体裁、词牌和正文，不要补充正文之外的事实。
 
-必须只输出严格 JSON 对象，不要 Markdown、代码块、注释或解释：
-{"items":[{"id":"...","极性":"积极","类型":["豪迈"],"题材":"边塞战争","意象":["大漠","孤烟"],"地名":[{"原文":"长安","规范名":"长安","类型":"城市"}],"创作阶段":"0743-0754"}]}
+标注字段：
 
-全局规则：
-1. items 必须覆盖每个输入 id；不得遗漏、重复或改写 id。
-2. 每条必须包含 id、极性、类型、题材、意象、地名、创作阶段七个键；不要输出其他键。
-3. 所有标签必须来自下方给定列表。
-4. 判断整首作品的主导情绪和主题，不要被个别字句带偏。
+1) 极性：只能选 "积极" / "中性" / "消极"。
+- 积极：整体以开阔、昂扬、闲适、喜悦、赞美、旷达为主。
+- 消极：整体以哀伤、离愁、亡国、思乡、孤独、衰败、战乱、悼亡为主。
+- 中性：叙事、写景、咏物、酬赠为主，或正负情绪接近。
 
-字段规则：
-
-【极性】只能选一个：
-["积极","中性","消极"]
-- 积极：昂扬、豪迈、旷达、喜悦、赞美、闲适、希望为主。
-- 消极：离愁、思乡、孤独、失意、悼亡、亡国、战乱、衰败、悲愤为主。
-- 中性：写景、叙事、咏物为主，或情绪不明显，或正负基本平衡。
-
-【类型】从下列标签中选 1-2 个，优先主导情绪，不要凑满：
+2) 类型：从下列标签中选 1-2 个，不能自造标签：
 ["豪迈","离愁","思乡","闲适","家国","爱情","哲思","孤独"]
 
-【题材】只能选 1 个，表示文本主要题材；不确定选"其他"：
+3) 题材：从下列标签中选 1 个，不能自造标签：
 ["山水田园","边塞战争","羁旅行役","送别酬赠","咏史怀古","咏物","闺情爱情","家国兴亡","悼亡伤逝","宴饮闲适","人生哲理","其他"]
-题材裁决：送别/酬赠优先"送别酬赠"；旅途漂泊优先"羁旅行役"；战争边塞优先"边塞战争"；朝代兴亡和国家危机优先"家国兴亡"；古人古事优先"咏史怀古"。
 
-【意象】字段必须存在，可为空数组。
-- 必须是正文中的连续子串，统一用简体。
-- 若正文中出现实际地名或地理专名，必须全部输出，不得遗漏。
-- 地名之外，再优先输出 0-5 个承载情绪、主题或时代特征的名词性意象，如 月、风、雨、花、柳、雁、江、山、关、塞、长安、酒、剑、舟、灯。
-- 可保留复合意象，如"大漠"、"孤烟"、"长河"、"故国"。
-- 不要输出抽象情绪或主题词，如"思乡"、"离愁"、"忧国"、"孤独"。
-- 宁可少选或输出 []，不要编造正文中没有的词。
+4) 意象：输出 2-5 个正文中实际出现的单字或词。
+- 必须是正文原文子串，统一用简体。
+- 不要输出正文中没有出现的概括词。
+- 优先选择承载情绪或主题的意象，如 月、江、山、风、花、酒、梦、故国、长安。
 
-【地名】输出数组，可为空。用于发现地名候选，不用于直接上地图。
-每项必须为对象：{"原文":"正文连续子串","规范名":"常用地名","类型":"..."}。
-- "原文"必须直接出现在正文中，不能改写。
-- "规范名"用简体；不确定时与"原文"相同。
-- "类型"只能选：["城市","州郡","关塞","山川","区域","古国","宫苑","其他"]。
-- 只输出真实地理实体或地理区域；不要输出朝代名、人物名、普通方位词或纯意象词。
-- 不确定是不是地名时不要输出。
+5) 创作阶段：输出粗略阶段，不要编造精确年份。
+- 若输入提供时期，优先结合时期输出，如 "晚唐五代时期"、"南宋时期"。
+- 若作者和文本有明确文学史阶段，可写简短阶段，如 "杜甫安史乱后漂泊时期"。
+- 若无法判断，输出输入时期或 "未定年时期"。
 
-【创作阶段】这是河流图使用的粗略时间桶，不代表作品确切创作年份。必须输出区间字符串或"未定年"，不要输出序号、阶段名称或具体年份；脚本会在后续映射为序号。
-
-时间桶含义：
-0713-0742=盛唐前期；0743-0754=盛唐后期；0755-0770=安史转折；0771-0805=中唐前期；0806-0835=中唐后期；0836-0907=晚唐；0908-0960=五代；0960-1042=北宋前期；1043-1093=北宋中期；1094-1126=北宋晚期；1127-1161=靖康南渡；1162-1279=南宋中后期；未定年=依据不足。
-
-时间桶选择规则：
-1. 不得选择与输入"时期"明显冲突的时间桶。
-2. 若断裂标签含"安史之乱"，优先选"0755-0770"；若含"靖康之变"，优先选"1127-1161"。
-3. 可根据作者、题目、正文和时期在同一大时期内做粗略判断，但不得编造具体年份。
-4. 若依据不足，输出"未定年"。
+输出要求：
+- 只输出严格 JSON，不要 Markdown，不要解释。
+- 必须包含输入中的每个 id。
+- 繁简视为同一字，统一输出简体。
+- JSON 格式：
+{"items":[{"id":"...","极性":"积极/中性/消极","类型":["..."],"题材":"...","意象":["..."],"创作阶段":"..."}]}
 """
 
 def get_key():
@@ -137,10 +116,21 @@ def parse_json(text):
     return None
 
 
+# 预编译地名正则：一次扫描匹配所有词典地名，避免逐地名 O(N) 子串查找
+_PLACE_PATTERN = re.compile("|".join(re.escape(p) for p in sorted(C.PLACE_NAMES, key=len, reverse=True)))
+
 def extract_place_names(text):
-    """按正文出现顺序提取词典内地名。"""
-    hits = [(text.find(place), place) for place in C.PLACE_NAMES if place in (text or "")]
-    return [place for _, place in sorted(hits)]
+    """按正文出现顺序提取词典内地名（单次正则扫描）。"""
+    if not text:
+        return []
+    seen = set()
+    result = []
+    for m in _PLACE_PATTERN.finditer(text):
+        place = m.group()
+        if place not in seen:
+            seen.add(place)
+            result.append(place)
+    return result
 
 
 def normalize_place_mentions(raw_places, text):
@@ -363,7 +353,7 @@ def main():
             sample = stratified_sample(rows, args.sample_size)
             print(f"  representative scope: 抽样 {len(sample)} 首")
 
-    print(f"MODEL={MODEL}  批大小={BATCH}  并发={MAX_WORKERS}  max_tokens={MAX_TOKENS}  实时保存=每完成1批")
+    print(f"MODEL={MODEL}  批大小={BATCH}  并发={MAX_WORKERS}  max_tokens={MAX_TOKENS}  checkpoint=每{CHECKPOINT_EVERY}批")
 
     # ── resume：加载已有结果 ──
     done = {}
@@ -392,24 +382,37 @@ def main():
                 print(f"  [warn] 批 {batch_no} 异常：{e}")
             if result:
                 done.update(result)
-                write_enriched(done)
-                print(f"  saved: 批 {batch_no} 新增 {len(result)} 条，累计 {len(done)} -> {C.ENRICH_OUTPUT}")
             completed += 1
+            # checkpoint 写盘（不每批写，减少磁盘I/O）
+            if CHECKPOINT_EVERY and completed % CHECKPOINT_EVERY == 0:
+                write_enriched(done)
+                print(f"  checkpoint: 已写 {len(done)} 条 -> {C.ENRICH_OUTPUT}")
             if completed % PROGRESS_EVERY == 0 or completed == total_batches:
                 print(f"  批 {completed}/{total_batches}  累计完成 {len(done)}")
 
-    # ── 逐首补跑：批次中校验失败导致漏掉的 ID ──
+    # ── 逐首补跑：批次中校验失败导致漏掉的 ID（并行小批次）──
     missed = [p for p in sample if p["id"] not in done]
     if missed:
-        print(f"\n  [补跑] {len(missed)} 首未入库，逐首重试...")
-        for p in missed:
-            result = _run_batch([p])
-            done.update(result)
-            if result:
-                write_enriched(done)
-                print(f"    saved: 累计 {len(done)} -> {C.ENRICH_OUTPUT}")
-            status = "✓" if result else "✗"
-            print(f"    {status} {p['author']} 《{p['title']}》")
+        print(f"\n  [补跑] {len(missed)} 首未入库，按{min(BATCH, 8)}首/批并行重试...")
+        # 小批次并行，不做单首串行
+        retry_batches = [missed[i:i + min(BATCH, 8)] for i in range(0, len(missed), min(BATCH, 8))]
+        with ThreadPoolExecutor(max_workers=min(MAX_WORKERS, len(retry_batches))) as ex:
+            retry_futures = {ex.submit(_run_batch, rb): i + 1 for i, rb in enumerate(retry_batches)}
+            for future in as_completed(retry_futures):
+                result = future.result()
+                if result:
+                    done.update(result)
+                    write_enriched(done)
+                    print(f"    saved: 累计 {len(done)} -> {C.ENRICH_OUTPUT}")
+        # 第二轮：对仍然漏掉的逐首抢救
+        still_missed = [p for p in sample if p["id"] not in done]
+        if still_missed:
+            print(f"  [最终抢救] {len(still_missed)} 首逐首重试...")
+            for p in still_missed:
+                result = _run_batch([p])
+                if result:
+                    done.update(result)
+                print(f"    {'✓' if result else '✗'} {p['author']} 《{p['title']}》")
 
     # ── 写出 ──
     if not done and C.ENRICH_OUTPUT.exists() and C.ENRICH_OUTPUT.stat().st_size > 0:
