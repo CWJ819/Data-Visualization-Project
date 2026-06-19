@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useState, useRef } from 'react'
 import echarts from '../charts.js'
+import { COLORS } from '../theme.js'
 
 let chinaRegistered = false
 
@@ -52,17 +53,17 @@ export default function GeoMap({ data, range }) {
     console.log('[GeoMap] 地名数:', placeEntries.length)
 
     const base = {
-      backgroundColor: '#f5f2eb',
+      backgroundColor: 'transparent',
       geo: {
         map: 'china',
         roam: true,
         itemStyle: {
-          areaColor: '#e9e1d8',
-          borderColor: '#d4d5cf',
+          areaColor: 'rgba(232, 221, 200, 0.58)',
+          borderColor: 'rgba(120, 100, 60, 0.28)',
           borderWidth: 0.8,
         },
         emphasis: {
-          itemStyle: { areaColor: '#d7c6d9' },
+          itemStyle: { areaColor: COLORS.neutralSoft },
         },
         zoom: 1.1,
       },
@@ -78,9 +79,12 @@ export default function GeoMap({ data, range }) {
       ...base,
       tooltip: {
         trigger: 'item',
+        appendToBody: true,
+        confine: true,
         backgroundColor: 'rgba(255,255,255,0.92)',
-        borderColor: '#cdc8aa',
-        textStyle: { color: '#5a5a5a', fontSize: 12 },
+        borderColor: COLORS.cardBorder,
+        textStyle: { color: COLORS.ink, fontSize: 12 },
+        extraCssText: 'border-radius:6px;box-shadow:0 8px 22px rgba(80,70,50,0.16);z-index:9999;',
         formatter: (p) => {
           const d = p.data
           return d ? `<b>${d.name}</b><br/>出现 ${d.count} 次` : ''
@@ -89,8 +93,8 @@ export default function GeoMap({ data, range }) {
       visualMap: {
         min: 1,
         max: maxCount,
-        inRange: { color: ['#cdc8aa', '#99a5c0', '#7f97ae'] },
-        textStyle: { color: '#7f97ae' },
+        inRange: { color: [COLORS.neutral, COLORS.stoneBlueSoft, COLORS.stoneBlueDeep] },
+        textStyle: { color: COLORS.stoneBlue },
         orient: 'vertical',
         right: 12,
         bottom: 40,
@@ -109,9 +113,9 @@ export default function GeoMap({ data, range }) {
             symbolSize: Math.sqrt(count / maxCount) * 40 + 8,
           }
         }).filter(Boolean),
-        itemStyle: { color: '#99a5c0', opacity: 0.8 },
+        itemStyle: { color: COLORS.stoneBlue, opacity: 0.84 },
         emphasis: {
-          itemStyle: { color: '#7f97ae' },
+          itemStyle: { color: COLORS.gold },
           scale: 1.5,
         },
       }],

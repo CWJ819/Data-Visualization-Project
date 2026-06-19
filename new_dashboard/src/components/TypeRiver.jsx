@@ -1,10 +1,6 @@
 import { useMemo } from 'react'
 import ChartBox from './ChartBox.jsx'
-
-const TYPE_COLORS = [
-  '#7f97ae', '#99a5c0', '#cdc8aa', '#e2ced0',
-  '#bfbea8', '#bbcadc', '#d7c6d9', '#a6b7a2',
-]
+import { COLORS, RIVER_COLORS } from '../theme.js'
 
 const PHASE_NAMES = [
   '盛唐前期', '盛唐后期', '唐易代转折期', '中唐前期',
@@ -22,16 +18,19 @@ export default function TypeRiver({ data }) {
     const seriesData = data.map(d => [d[0], d[1], d[2]])
 
     return {
-      backgroundColor: '#f5f2eb',
+      backgroundColor: 'transparent',
       tooltip: {
         trigger: 'item',
+        appendToBody: true,
+        confine: true,
         formatter: (params) => {
           const name = params.value ? params.value[2] : ''
-          return `<span style="font-weight:600;color:#5a5a5a;font-size:13px;">${name}</span>`
+          return `<span style="font-weight:600;color:${COLORS.ink};font-size:13px;">${name}</span>`
         },
         backgroundColor: 'rgba(255,255,255,0.92)',
-        borderColor: '#cdc8aa',
-        textStyle: { color: '#5a5a5a', fontSize: 13 },
+        borderColor: COLORS.cardBorder,
+        textStyle: { color: COLORS.ink, fontSize: 13 },
+        extraCssText: 'border-radius:6px;box-shadow:0 8px 22px rgba(80,70,50,0.16);z-index:9999;',
       },
       singleAxis: {
         type: 'value',
@@ -40,7 +39,7 @@ export default function TypeRiver({ data }) {
         interval: 1,
         bottom: 60,
         axisLabel: {
-          color: '#7f97ae',
+          color: COLORS.stoneBlue,
           fontSize: 9,
           rotate: -30,
           formatter: (v) => {
@@ -52,11 +51,19 @@ export default function TypeRiver({ data }) {
       series: [{
         type: 'themeRiver',
         data: seriesData,
-        color: TYPE_COLORS,
+        color: RIVER_COLORS.slice(0, 8),
+        itemStyle: {
+          opacity: 0.78,
+        },
+        emphasis: {
+          itemStyle: {
+            opacity: 0.94,
+          },
+        },
       }],
     }
   }, [data])
 
   if (!option) return null
-  return <ChartBox option={option} style={{ height: 320 }} />
+  return <ChartBox option={option} style={{ height: '100%' }} />
 }

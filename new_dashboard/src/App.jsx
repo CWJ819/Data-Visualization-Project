@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useData, useImageryFiltered } from './hooks/useData.js'
 import TypeRiver from './components/TypeRiver.jsx'
 import ThemeRiver from './components/ThemeRiver.jsx'
@@ -10,6 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 export default function App() {
   const [range, setRange] = useState([1, 12])
+  const [selectedImagery, setSelectedImagery] = useState([])
 
   const { data: typesData } = useData('/data/types_by_phase.json')
   const { data: themesData } = useData('/data/themes_by_phase.json')
@@ -19,67 +20,80 @@ export default function App() {
 
   const filteredImagery = useImageryFiltered(imageryData, range)
 
+  const toggleImagery = useCallback((name) => {
+    setSelectedImagery(prev => {
+      if (prev.includes(name)) return prev.filter(item => item !== name)
+      if (prev.length < 2) return [...prev, name]
+      return [prev[1], name]
+    })
+  }, [])
+
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>唐宋诗词 · 文学史阶段分析</h1>
-        <span className="app-subtitle">基于 LLM 标注的 609 首名篇</span>
-      </header>
+      <aside className="title-panel">
+        <img className="title-image" src="/assets/title.png" alt="唐宋诗词的时代回响" />
+      </aside>
 
-      <div className="app-body">
-        <div className="panel panel-left">
-          <ErrorBoundary>
-            <div className="river-section">
-              <div className="river-title">8 种情感类型 · 河流图</div>
-              <div className="river-chart">
-                <TypeRiver data={typesData} />
-              </div>
-            </div>
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-            <div className="river-section">
-              <div className="river-title">12 种题材分类 · 河流图</div>
-              <div className="river-chart">
-                <ThemeRiver data={themesData} />
-              </div>
-            </div>
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-            <div className="river-section">
-              <div className="river-title">16 组意象趋势 · 折线图</div>
-              <div className="river-chart">
-                <TrendLine data={trendData} />
-              </div>
-            </div>
-          </ErrorBoundary>
-
-          <div className="slider-section">
-            <RangeSlider value={range} onChange={setRange} min={1} max={12} />
-          </div>
+      <aside className="decor-panel">
+        <div className="period-control">
+          <div className="period-control-title">阶段范围 {range[0]}-{range[1]}</div>
+          <RangeSlider value={range} onChange={setRange} min={1} max={12} />
         </div>
+      </aside>
 
-        <div className="panel panel-right">
-          <div className="geo-section">
-            <div className="section-title">地理空间分布</div>
-            <div className="geo-chart">
-              <ErrorBoundary>
-                <GeoMap data={geoData} range={range} />
-              </ErrorBoundary>
-            </div>
-          </div>
-
-          <div className="wordcloud-section">
-            <div className="section-title">意象词云（阶段 {range[0]}–{range[1]}）</div>
-            <div className="wordcloud-chart">
-              <ErrorBoundary>
-                <WordCloud data={filteredImagery} />
-              </ErrorBoundary>
-            </div>
-          </div>
+      <section className="dashboard-cell river-a">
+        <div className="cell-title">河流图 A · 情感类型</div>
+        <div className="chart-area">
+          <ErrorBoundary>
+            <TypeRiver data={typesData} />
+          </ErrorBoundary>
         </div>
-      </div>
+      </section>
+
+      <section className="dashboard-cell river-b">
+        <div className="cell-title">河流图 B · 题材分类</div>
+        <div className="chart-area">
+          <ErrorBoundary>
+            <ThemeRiver data={themesData} />
+          </ErrorBoundary>
+        </div>
+      </section>
+
+      <section className="dashboard-cell geo-cell">
+        <div className="cell-title">地理分布图</div>
+        <div className="chart-area">
+          <ErrorBoundary>
+            <GeoMap data={geoData} range={range} />
+          </ErrorBoundary>
+        </div>
+      </section>
+
+      <section className="dashboard-cell trend-cell">
+        <div className="cell-title">意象变化折线图</div>
+        <div className="chart-area">
+          <ErrorBoundary>
+            <TrendLine data={trendData} selectedImagery={selectedImagery} />
+          </ErrorBoundary>
+        </div>
+      </section>
+
+      <section className="dashboard-cell wordcloud-cell">
+        <div className="cell-title">
+          意象词云（阶段：{range[0]}-{range[1]}）
+          {selectedImagery.length > 0 && (
+            <span className="title-selection">已选：{selectedImagery.join(' / ')}</span>
+          )}
+        </div>
+        <div className="chart-area">
+          <ErrorBoundary>
+            <WordCloud
+              data={filteredImagery}
+              trendData={trendData}
+              onToggleImagery={toggleImagery}
+            />
+          </ErrorBoundary>
+        </div>
+      </section>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import ChartBox from './ChartBox.jsx'
+import { COLORS, TREND_COLORS } from '../theme.js'
 
 const PHASE_NAMES = [
   '盛唐前期', '盛唐后期', '唐易代转折期', '中唐前期',
@@ -7,69 +8,152 @@ const PHASE_NAMES = [
   '北宋中期', '北宋晚期', '宋易代转折期', '南宋中后期',
 ]
 
-const TREND_COLORS = [
-  '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c',
-  '#3498db', '#2980b9', '#8e44ad', '#e84393', '#636e72',
-  '#00b894', '#6c5ce7', '#fd79a8', '#00cec9', '#a29bfe', '#fab1a0',
+const PHASE_LABELS = [
+  '盛唐\n前期',
+  '盛唐\n后期',
+  '唐易代\n转折',
+  '中唐\n前期',
+  '中唐\n后期',
+  '晚唐\n时期',
+  '五代\n十国',
+  '北宋\n前期',
+  '北宋\n中期',
+  '北宋\n晚期',
+  '宋易代\n转折',
+  '南宋\n中后期',
 ]
 
-export default function TrendLine({ data }) {
+const EVENT_LINE_COLOR = '#A94B3D'
+const DEFAULT_VISIBLE_COUNT = 5
+
+export default function TrendLine({ data, selectedImagery = [] }) {
   const option = useMemo(() => {
     if (!data) return null
 
     const groups = Object.keys(data)
+    const activeSelected = selectedImagery.filter(group => groups.includes(group))
+    const visibleGroups = [...groups]
+      .sort((a, b) => {
+        const sumA = Object.values(data[a]).reduce((sum, v) => sum + Number(v || 0), 0)
+        const sumB = Object.values(data[b]).reduce((sum, v) => sum + Number(v || 0), 0)
+        return sumB - sumA
+      })
+      .slice(0, DEFAULT_VISIBLE_COUNT)
+    const groupsToShow = activeSelected.length > 0 ? activeSelected : visibleGroups
+
+    const legendSelected = Object.fromEntries(
+      groups.map(group => [group, groupsToShow.includes(group)])
+    )
+
     const series = groups.map((group, i) => ({
       name: group,
       type: 'line',
       data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(p =>
         data[group][String(p)] ?? 0
       ),
-      smooth: true,
+      smooth: 0.35,
       symbol: 'circle',
-      symbolSize: 4,
-      lineStyle: { width: 1.5 },
+      symbolSize: 5,
+      showSymbol: false,
+      lineStyle: { width: 2.25 },
+      emphasis: {
+        focus: 'series',
+        lineStyle: { width: 3 },
+      },
     }))
 
     return {
-      backgroundColor: '#f5f2eb',
+      backgroundColor: 'transparent',
       legend: {
         data: groups,
         top: 4,
-        textStyle: { color: '#5a5a5a', fontSize: 10 },
+        selected: legendSelected,
+        selectedMode: 'multiple',
+        inactiveColor: 'rgba(108,98,86,0.28)',
+        textStyle: { color: COLORS.ink, fontSize: 10 },
         type: 'scroll',
       },
       tooltip: {
         trigger: 'axis',
+        appendToBody: true,
+        confine: true,
         backgroundColor: 'rgba(255,255,255,0.92)',
-        borderColor: '#cdc8aa',
-        textStyle: { color: '#5a5a5a', fontSize: 11 },
+        borderColor: COLORS.cardBorder,
+        textStyle: { color: COLORS.ink, fontSize: 11 },
+        extraCssText: 'border-radius:6px;box-shadow:0 8px 22px rgba(80,70,50,0.16);z-index:9999;',
       },
       grid: {
-        top: 44,
-        bottom: 30,
-        left: 40,
-        right: 20,
+        top: 56,
+        bottom: 46,
+        left: 44,
+        right: 24,
       },
       xAxis: {
         type: 'category',
         data: PHASE_NAMES,
-        axisLabel: { color: '#7f97ae', fontSize: 8, interval: 0, rotate: -25 },
-        axisLine: { lineStyle: { color: '#d4d5cf' } },
+        axisLabel: {
+          color: COLORS.inkSoft,
+          fontSize: 9,
+          interval: 0,
+          rotate: 0,
+          lineHeight: 13,
+          formatter: (_, idx) => PHASE_LABELS[idx] ?? '',
+        },
+        axisLine: { lineStyle: { color: 'rgba(120,100,60,0.24)' } },
         splitLine: { show: false },
       },
       yAxis: {
         type: 'value',
         name: '次/百首',
-        nameTextStyle: { color: '#7f97ae', fontSize: 9 },
-        axisLabel: { color: '#7f97ae', fontSize: 9 },
-        splitLine: { lineStyle: { color: '#e9e1d8' } },
+        nameTextStyle: { color: COLORS.inkSoft, fontSize: 9 },
+        axisLabel: { color: COLORS.inkSoft, fontSize: 9 },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { lineStyle: { color: 'rgba(120,100,60,0.14)' } },
       },
-      series: series.map((s, i) => ({
-        ...s,
-        itemStyle: { color: TREND_COLORS[i % TREND_COLORS.length] },
-      })),
+      series: [
+        ...series.map((s, i) => ({
+          ...s,
+          itemStyle: { color: TREND_COLORS[i % TREND_COLORS.length] },
+        })),
+        {
+          name: '__historical_events__',
+          type: 'line',
+          data: new Array(PHASE_NAMES.length).fill(null),
+          symbol: 'none',
+          silent: true,
+          tooltip: { show: false },
+          lineStyle: { opacity: 0 },
+          markLine: {
+            symbol: 'none',
+            silent: true,
+            lineStyle: {
+              color: EVENT_LINE_COLOR,
+              width: 1,
+              type: 'solid',
+              opacity: 0.78,
+            },
+            label: {
+              show: true,
+              position: 'insideEndTop',
+              formatter: (params) => params.name,
+              color: EVENT_LINE_COLOR,
+              fontSize: 10,
+              fontFamily: 'KaiTi, STKaiti, serif',
+              lineHeight: 13,
+              backgroundColor: 'rgba(245,235,211,0.72)',
+              borderRadius: 3,
+              padding: [2, 4],
+            },
+            data: [
+              { name: '755 CE\nAn Lushan\nRebellion', xAxis: '唐易代转折期' },
+              { name: '1127 CE\nJingkang\nIncident', xAxis: '宋易代转折期' },
+            ],
+          },
+        },
+      ],
     }
-  }, [data])
+  }, [data, selectedImagery])
 
   if (!option) return null
   return <ChartBox option={option} style={{ height: '100%' }} />
