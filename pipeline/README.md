@@ -1,93 +1,155 @@
-# pipeline/ — 数据处理管道
+当前 pipeline 设计和预期结果如下，按执行顺序看。
 
-把 `dataset/`（全唐诗 + 宋词 + 五代词）处理成仪表盘可用的数据。
-**完全确定性、可复现、繁简统一**；LLM 富化已纳入主流程，无 API Key 时自动跳过。
+  1. ingest.py
+  命令：
 
-## 数据流
+  python pipeline/ingest.py
 
-```
-dataset/全唐诗/poet.tang.*         ┐
-dataset/宋词/ci.song.*             ├─ ingest.py ──→ output/corpus/poems.jsonl
-dataset/五代诗词/huajianji/*.json   │                        │
-dataset/五代诗词/nantang/*.json    ┘                        │
-作者元数据 / 三百首选集 / WUDAI_ANTHOLOGY_KEYS                │
-                                                            ├─ enrich_llm.py ──→ output/enrich/enriched.jsonl
-                                                            │   (8线程并发；无 DEEPSEEK_API_KEY 自动跳过)
-                                                            │
-                                                            ├─ metrics.py ──→ dashboard/data/*.json (11个)
-                                                            │   (词典法+LLM双轨；含 word_freq_by_period)
-                                                            └─ qa.py（校验，退出码0=全通过）
-```
+  作用：
 
-运行顺序：`ingest.py → enrich_llm.py → metrics.py → qa.py`
+  - 读取唐诗、宋词、五代词原始语料。
+  - text_raw 保留原文。
+  - text 统一转简体。
+  - 生成 canonical corpus：
 
-## 各脚本
+  pipeline/output/corpus/poems.jsonl
 
-| 脚本 | 职责 | 输入 → 输出 |
-|---|---|---|
-| `config.py` | **单一事实源**：时期/断裂/诗人表/年号/词典/意象/地名/体裁/五代词精选 (`WUDAI_ANTHOLOGY_KEYS`) | — |
-| `normalize.py` | 繁→简（opencc，失败回退字表）、分词、繁体残留检测 | — |
-| `ingest.py` | 防呆断言、繁简归一、体裁分类、定年阶梯、去重、名气标记；花间集+南唐二主词并入晚唐五代；五代词精选标记 `in_anthology` | dataset → `output/corpus/poems.jsonl` |
-| `enrich_llm.py` | DeepSeek LLM 情感富化（8线程并发，temperature=0.1，完整正文，分级校验+逐首补跑）；`--scope stars`（默认）处理 in_anthology+策展名篇约 600 首 | corpus → `output/enrich/enriched.jsonl` |
-| `metrics.py` | 确定性指标，`--scope full\|representative\|anthology`（默认 representative）；自动读取 enriched.jsonl 双轨情感；输出 11 个 JSON | corpus + enriched → `dashboard/data/*.json` |
-| `qa.py` | 严格JSON / 时期单调 / 繁体残留=0 / 去重 / 定年对账 / 坐标范围 | corpus + dashboard，退出码 0=全通过 |
-| `_legacy/` | 旧版脚本存档，不再使用，不进 git | — |
+  当前预期规模：
 
-## 核心设计
+  总量：79190
+  representative：43332
+  datable representative：43304
+  未定年：23092
 
-- **繁简统一**：唐诗繁体、宋词/五代词简体；全部经 opencc 转为简体后统计，`text` 供统计，`text_raw` 保留原文展示。
-- **定年 = 有序时期，不伪造年份**：唐诗用 `诗人表→bio年号` (~75%)，宋词用 `词人表→bio生年阈值1085`，五代词强制归 `晚唐五代`；定不了→`未定年`（不进时间轴）。
-- **五期 + 两大断裂**：盛唐→中唐→晚唐五代→北宋→南宋；接缝 755（安史之乱）、1127（靖康之变）。
-- **流 / 繁星双层**：时期聚合=流（宏观趋势）；三百首+五代词精选逐首=繁星（`stars.json`，592首）。
-- **LLM 双轨情感**：词典法覆盖全量；LLM 精标覆盖 609 首选集名篇，分级校验确保数据质量。
+  这里仍然只负责粗时期：
 
-## canonical schema（poems.jsonl 每行）
+  盛唐 / 中唐 / 晚唐 / 五代 / 北宋 / 南宋 / 未定年
 
-```
-id, dynasty(唐/宋), genre_type(诗/词), author, title, ci_pai,
-period(盛唐/中唐/晚唐五代/北宋/南宋/未定年), period_source, period_confidence,
-datable, text_raw, text(简体), lines, char_count, form,
-in_anthology, is_representative, curated_tags[], source_file
-```
+  不在 ingest 阶段生成 1-12 细阶段。
 
-id 前缀规则：全唐诗原 id / `ci_<hash>`（宋词）/ `wudai_<hash>`（五代词）
+  2. enrich_llm.py
+  推荐全量 representative 重跑命令：
 
-## dashboard/data 产物（11 个）
+  python pipeline/enrich_llm.py --scope representative --all-representative
 
-| 文件 | 内容 |
-|---|---|
-| `meta.json` | 语料规模、时期计数、scope、datable 比例、事件表、LLM 富化数 |
-| `sentiment_by_period.json` | 各时期情感均值；`sentiment_score`（词典法全量）+ `llm_sentiment_score`（LLM精标） |
-| `imagery_flow.json` | 各时期宏大/私人意象频率 + `externality_index`（宏/私比） |
-| `genre_by_period.json` | 各时期体裁占比（百分比） |
-| `word_freq_comparison.json` | 全唐 vs 全宋词频 Top200（已统一简体） |
-| `word_freq_by_period.json` | **各时期词频 Top100**（过滤停用词；前端分时期词云数据源） |
-| `place_geo.json` | 地名分布（by_period / by_dynasty）+ 坐标 |
-| `stars.json` | 繁星：592 首名篇逐首（含 `polarity_llm / types_llm / theme_llm / stage_llm`） |
-| `rupture_755.json` | 安史之乱断面：盛唐 vs 中唐，升降词，策展名篇 |
-| `rupture_1127.json` | 靖康之变断面：北宋 vs 南宋，升降词，策展名篇 |
+  注意：如果要让旧 enriched.jsonl 里的阶段格式全部更新，不要加 --resume。加 --resume 会跳过旧记录。
 
-## 运行
+  LLM 负责输出：
 
-```bash
-# 环境准备（需 conda vis 环境）
-conda activate vis
-pip install opencc-python-reimplemented   # 首次使用时安装
-export PYTHONIOENCODING=utf-8             # Windows 控制台必须
+  {
+    "极性": "积极/中性/消极",
+    "类型": ["豪迈"],
+    "题材": "边塞战争",
+    "意象": ["长安", "月"],
+    "创作阶段": "0755-0770"
+  }
 
-# 四步顺序执行
-python pipeline/ingest.py
-python pipeline/enrich_llm.py --resume   # 需 DEEPSEEK_API_KEY；无 key 自动跳过
-python pipeline/metrics.py
-python pipeline/qa.py                    # 退出码 0 = 全部通过
+  但最终写入 enriched.jsonl 时，脚本会把 创作阶段 映射成序号：
 
-# LLM 富化（首次需设置 key）
-export DEEPSEEK_API_KEY=<your_key>
+  "0755-0770" -> 3
 
-# 扩大 LLM 样本（可选，待 types_llm 分布图开发时使用）
-python pipeline/enrich_llm.py --scope representative --sample-size 3000 --resume
-```
+  也就是说：
 
-**依赖**：`opencc-python-reimplemented`（繁→简，必须）；`requests`（仅 enrich_llm）。
+  - LLM 不输出序号。
+  - Python 脚本负责区间到序号的映射。
+  - 最终 enriched.jsonl 里的 创作阶段 应是 1-12 的整数。
 
-> ⚠️ 若 `normalize.py` 打印 `归一模式=identity`，说明 opencc 未安装，繁体残留会导致 QA 失败。
+  未定年 归并规则：
+
+  安史之乱标签 -> 3
+  靖康之变标签 -> 11
+  盛唐 -> 2
+  中唐 -> 4
+  晚唐 -> 6
+  五代 -> 7
+  北宋 -> 9
+  南宋 -> 12
+  仅知唐 -> 5
+  仅知宋 -> 10
+
+  地名处理：
+
+  - LLM 可能漏地名，但脚本会用 config.PLACE_NAMES 从正文中确定性补齐。
+  - 因此 意象_llm 中不会漏掉词典内实际地名。
+  - 词典外地名不会自动上地图，需要补进 PLACE_NAMES 并给坐标。
+
+  3. metrics.py
+  命令：
+
+  python pipeline/metrics.py
+
+  默认 scope：
+
+  representative
+
+  如需全量地名图：
+
+  python pipeline/metrics.py --scope full
+
+  输出：
+
+  dashboard/data/*.json
+
+  其中 place_geo.json 现在有三层地名聚合：
+
+  {
+    "by_period": {
+      "盛唐": [...]
+    },
+    "by_stage_order": {
+      "1": [...],
+      "2": [...],
+      ...
+      "12": [...]
+    },
+    "by_dynasty": {
+      "唐": [...],
+      "宋": [...]
+    },
+    "stage_meta": [
+      {"order": 1, "time_bin": "0713-0742", "label": "盛唐前期"}
+    ]
+  }
+
+  地点项格式：
+
+  {
+    "name": "长安",
+    "lng": 108.94,
+    "lat": 34.26,
+    "count": 176,
+    "poem_count": 162
+  }
+
+  含义：
+
+  count = 地名总出现次数
+  poem_count = 出现该地名的作品数
+
+  by_stage_order 的阶段来源优先级：
+
+  1. enriched.jsonl 中的 创作阶段 序号
+  2. enriched.jsonl 中的 创作阶段 区间字符串
+  3. 没有 enriched 结果时，用 corpus 的粗时期 deterministic fallback
+
+  因此，只有重跑全量 representative enrich 后，by_stage_order 才会真正细化到 1-12；否则未富化作品会走粗时期 fallback，部分阶段可能为空或偏粗。
+
+  4. qa.py
+  命令：
+
+  python pipeline/qa.py
+
+  当前已验证结果：
+
+  dashboard JSON 严格性：OK
+  时期序列：OK
+  语料校验：OK
+  地名坐标范围：OK
+  结果：全部通过，0 WARN
+
+  你需要重点确认的设计点
+
+  1. 创作阶段 最终是否应写入 enriched.jsonl 为整数 1-12。
+  2. by_stage_order 是否需要默认用 representative，还是要改成 full corpus。
+  3. 未定年 的归并默认是否接受：唐 -> 5，宋 -> 10。
+  4. 地图地名是否只以 PLACE_NAMES 为准；词典外地名需要补坐标。

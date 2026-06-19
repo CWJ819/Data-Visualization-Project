@@ -261,28 +261,156 @@ def word_freq_by_period(rows):
     }
 
 
-def place_geo(rows):
+def _stage_order_from_enriched(value):
+    if isinstance(value, int) and 1 <= value <= len(C.TIME_STAGE_BINS):
+        return value
+    if isinstance(value, str):
+        s = value.strip()
+        if s.isdigit():
+            n = int(s)
+            return n if 1 <= n <= len(C.TIME_STAGE_BINS) else None
+        return C.PERIOD_ORDER.get(s)
+    return None
+
+
+def _stage_order_for_place_row(p, enriched):
+    e = enriched.get(p["id"]) if enriched else None
+    if e:
+        stage_order = _stage_order_from_enriched(e.get("创作阶段"))
+        if stage_order is not None:
+            return stage_order
+    return C.stage_order_for_record(
+        p.get("period"),
+        p.get("dynasty"),
+        p.get("genre_type"),
+        p.get("period_source"),
+        p.get("curated_tags"),
+    )
+
+
+def place_geo(rows, enriched=None):
     by_period = defaultdict(Counter)
+    by_period_poems = defaultdict(Counter)
+    by_stage_order = defaultdict(Counter)
+    by_stage_order_poems = defaultdict(Counter)
     by_dynasty = defaultdict(Counter)
+    by_dynasty_poems = defaultdict(Counter)
     for p in rows:
         t = p["text"]
+        stage_order = _stage_order_for_place_row(p, enriched or {})
         for place in C.PLACE_NAMES:
-            if place in t:
+            n = t.count(place)
+            if n:
                 if p["datable"]:
-                    by_period[p["period"]][place] += 1
-                by_dynasty[p["dynasty"]][place] += 1
+                    by_period[p["period"]][place] += n
+                    by_period_poems[p["period"]][place] += 1
+                by_stage_order[stage_order][place] += n
+                by_stage_order_poems[stage_order][place] += 1
+                by_dynasty[p["dynasty"]][place] += n
+                by_dynasty_poems[p["dynasty"]][place] += 1
 
-    def to_rows(counter):
+    def to_rows(counter, poem_counter):
         out = []
         for place, cnt in counter.most_common():
             lng, lat = C.PLACE_NAMES[place]
-            out.append({"name": place, "lng": lng, "lat": lat, "count": cnt})
+            out.append({
+                "name": place,
+                "lng": lng,
+                "lat": lat,
+                "count": cnt,
+                "poem_count": poem_counter.get(place, 0),
+            })
         return out
 
-    return {"by_period": {per: to_rows(by_period[per]) for per in C.PERIODS if per in by_period},
-            "by_dynasty": {d: to_rows(by_dynasty[d]) for d in by_dynasty},
+    return {"by_period": {per: to_rows(by_period[per], by_period_poems[per]) for per in C.PERIODS if per in by_period},
+            "by_stage_order": {
+                str(stage["order"]): to_rows(
+                    by_stage_order[stage["order"]],
+                    by_stage_order_poems[stage["order"]],
+                )
+                for stage in C.HISTORICAL_STAGES
+            },
+            "stage_meta": C.HISTORICAL_STAGES,
+            "by_dynasty": {d: to_rows(by_dynasty[d], by_dynasty_poems[d]) for d in by_dynasty},
             "place_coords": C.PLACE_NAMES,
-            "description": "诗歌地名分布（地图散点/热力）；注：宋词中北宋首都多以「东京」「故都」等形式出现，未被本词典识别，汴京/汴梁计数为0属语料用词限制"}
+            "description": "诗歌地名分布（地图散点/热力）；by_stage_order 按 1-12 历史阶段聚合；count=地名总出现次数，poem_count=涉及作品数；注：宋词中北宋首都多以「东京」「故都」等形式出现，未被本词典识别，汴京/汴梁计数为0属语料用词限制"}
+
+
+def _place_example(p, surface):
+    for line in p["text"].split("\n"):
+        if surface in line:
+            return {
+                "id": p["id"],
+                "author": p["author"],
+                "title": p["title"],
+                "period": p["period"],
+                "line": line.strip(),
+            }
+    return {
+        "id": p["id"],
+        "author": p["author"],
+        "title": p["title"],
+        "period": p["period"],
+        "line": p["text"].split("\n", 1)[0].strip(),
+    }
+
+
+def llm_place_mentions(rows, enriched):
+    row_by_id = {p["id"]: p for p in rows}
+    resolved = defaultdict(lambda: {"count": 0, "poem_ids": set(), "types": Counter(), "examples": []})
+    unresolved = defaultdict(lambda: {"count": 0, "poem_ids": set(), "types": Counter(), "examples": []})
+
+    for pid, e in enriched.items():
+        p = row_by_id.get(pid)
+        if not p:
+            continue
+        for m in e.get("地名_llm", []) or []:
+            if not isinstance(m, dict):
+                continue
+            surface = str(m.get("原文") or "").strip()
+            name = str(m.get("规范名") or surface).strip()
+            place_type = str(m.get("类型") or "其他").strip()
+            if not surface or surface not in p["text"]:
+                continue
+            coord_name = name if name in C.PLACE_NAMES else (surface if surface in C.PLACE_NAMES else None)
+            bucket = resolved if coord_name else unresolved
+            key = coord_name or name
+            rec = bucket[key]
+            rec["count"] += p["text"].count(surface)
+            rec["poem_ids"].add(pid)
+            rec["types"][place_type] += 1
+            if len(rec["examples"]) < 5:
+                rec["examples"].append(_place_example(p, surface))
+
+    def rows_from(bucket, with_coords):
+        out = []
+        for name, rec in bucket.items():
+            row = {
+                "name": name,
+                "count": rec["count"],
+                "poem_count": len(rec["poem_ids"]),
+                "types": dict(rec["types"]),
+                "examples": rec["examples"],
+            }
+            if with_coords:
+                row["lng"], row["lat"] = C.PLACE_NAMES[name]
+            out.append(row)
+        return sorted(out, key=lambda x: (-x["count"], x["name"]))
+
+    resolved_rows = rows_from(resolved, True)
+    unresolved_rows = rows_from(unresolved, False)
+    return (
+        {
+            "places": resolved_rows,
+            "count": len(resolved_rows),
+            "description": "LLM 地名候选中已能匹配 PLACE_NAMES 坐标的地名，可直接地图展示。",
+        },
+        {
+            "places": unresolved_rows,
+            "count": len(unresolved_rows),
+            "description": "LLM 发现但 PLACE_NAMES 暂无坐标的地名候选，需要人工确认并补坐标后才能上地图。",
+        },
+    )
 
 
 # ── 繁星：选集名篇逐首 ───────────────────────────────
@@ -410,7 +538,10 @@ def main():
     write(out / "imagery_flow.json", imagery_flow(rows))
     write(out / "genre_by_period.json", genre_by_period(rows))
     write(out / "word_freq_comparison.json", word_freq(rows))
-    write(out / "place_geo.json", place_geo(rows))
+    write(out / "place_geo.json", place_geo(rows, enriched))
+    resolved_places, unresolved_places = llm_place_mentions(rows, enriched)
+    write(out / "place_mentions_resolved.json", resolved_places)
+    write(out / "place_mentions_unresolved.json", unresolved_places)
     write(out / "word_freq_by_period.json", word_freq_by_period(rows))
     write(out / "stars.json", stars(all_rows, enriched))
     for spec in C.RUPTURES:

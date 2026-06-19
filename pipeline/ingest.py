@@ -209,7 +209,7 @@ def process(files, dynasty, genre_type, is_ci, bios, anthology, curated_dynasty_
 
 
 def process_wudai_ci(files, anthology):
-    """处理五代词（花间集 + 南唐二主词），强制归入晚唐五代。"""
+    """处理五代词（花间集 + 南唐二主词），强制归入五代。"""
     _, song_keys = anthology
     poems, seen = [], set()
     empty = dup = skipped = 0
@@ -259,7 +259,7 @@ def process_wudai_ci(files, anthology):
                 "author": author,
                 "title": title,
                 "ci_pai": rhythmic or None,
-                "period": "晚唐五代",
+                "period": "五代",
                 "period_source": "五代词集",
                 "period_confidence": "high",
                 "datable": True,
