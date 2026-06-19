@@ -171,3 +171,45 @@ if (!existsSync(placeNamesFile)) {
   const phasesWithData = Object.keys(geoByPhase).sort((a, b) => a - b)
   console.log(`\n[地理] 匹配 ${geoMatches} 次, ${phasesWithData.length} 个阶段有数据, 写入 geo_by_phase.json`)
 }
+
+// ════════════════ 意象分组趋势（折线图用）════════════════
+const groupsFile = resolve(DATA_DIR, 'imagery_groups.json')
+if (!existsSync(groupsFile)) {
+  console.log(`\n[趋势] 未找到 ${groupsFile}，跳过意象趋势`)
+} else {
+  const groups = JSON.parse(readFileSync(groupsFile, 'utf-8'))
+
+  // 对每组关键词，按阶段统计出现次数（归一化到 per_100）
+  const trendByPhase = {}
+  // 初始化所有组，确保无匹配的组也输出空数据
+  for (const [groupName] of groups) {
+    trendByPhase[groupName] = {}
+  }
+
+  for (const [groupName, keywords] of groups) {
+    for (const r of records) {
+      const phase = r['创作阶段']
+      if (phase == null) continue
+      const imageries = r['意象_llm'] || []
+      const found = keywords.some(kw => imageries.some(img => img.includes(kw)))
+      if (!found) continue
+
+      trendByPhase[groupName] ??= {}
+      trendByPhase[groupName][phase] = (trendByPhase[groupName][phase] || 0) + 1
+    }
+  }
+
+  // 归一化为每百首出现次数
+  const trendOutput = {}
+  for (const [groupName, phases] of Object.entries(trendByPhase)) {
+    trendOutput[groupName] = {}
+    for (let p = 1; p <= 12; p++) {
+      const count = phases[String(p)] || 0
+      const total = poemCountPerPhase[String(p)] || 1
+      trendOutput[groupName][p] = +(count / total * 100).toFixed(2)
+    }
+  }
+
+  writeFileSync(resolve(OUTPUT_DIR, 'imagery_trend.json'), JSON.stringify(trendOutput))
+  console.log(`\n[趋势] ${Object.keys(trendOutput).length} 组意象趋势, 写入 imagery_trend.json`)
+}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useData, useImageryFiltered } from './hooks/useData.js'
 import TypeRiver from './components/TypeRiver.jsx'
 import ThemeRiver from './components/ThemeRiver.jsx'
+import TrendLine from './components/TrendLine.jsx'
 import RangeSlider from './components/RangeSlider.jsx'
 import WordCloud from './components/WordCloud.jsx'
 import GeoMap from './components/GeoMap.jsx'
@@ -14,6 +15,7 @@ export default function App() {
   const { data: themesData } = useData('/data/themes_by_phase.json')
   const { data: imageryData } = useData('/data/imagery_by_phase.json')
   const { data: geoData } = useData('/data/geo_by_phase.json')
+  const { data: trendData } = useData('/data/imagery_trend.json')
 
   const filteredImagery = useImageryFiltered(imageryData, range)
 
@@ -40,6 +42,15 @@ export default function App() {
               <div className="river-title">12 种题材分类 · 河流图</div>
               <div className="river-chart">
                 <ThemeRiver data={themesData} />
+              </div>
+            </div>
+          </ErrorBoundary>
+
+          <ErrorBoundary>
+            <div className="river-section">
+              <div className="river-title">16 组意象趋势 · 折线图</div>
+              <div className="river-chart">
+                <TrendLine data={trendData} />
               </div>
             </div>
           </ErrorBoundary>
