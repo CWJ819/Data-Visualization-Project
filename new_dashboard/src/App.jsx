@@ -4,7 +4,7 @@ import TypeRiver from './components/TypeRiver.jsx'
 import ThemeRiver from './components/ThemeRiver.jsx'
 import RangeSlider from './components/RangeSlider.jsx'
 import WordCloud from './components/WordCloud.jsx'
-import GeoPlaceholder from './components/GeoPlaceholder.jsx'
+import GeoMap from './components/GeoMap.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 export default function App() {
@@ -13,6 +13,7 @@ export default function App() {
   const { data: typesData } = useData('/data/types_by_phase.json')
   const { data: themesData } = useData('/data/themes_by_phase.json')
   const { data: imageryData } = useData('/data/imagery_by_phase.json')
+  const { data: geoData } = useData('/data/geo_by_phase.json')
 
   const filteredImagery = useImageryFiltered(imageryData, range)
 
@@ -53,7 +54,7 @@ export default function App() {
             <div className="section-title">地理空间分布</div>
             <div className="geo-chart">
               <ErrorBoundary>
-                <GeoPlaceholder range={range} />
+                <GeoMap data={geoData} range={range} />
               </ErrorBoundary>
             </div>
           </div>

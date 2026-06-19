@@ -112,3 +112,51 @@ console.log(`题材河流图数据: ${themesRiver.length} 行 (${ALL_THEMES.size
 console.log(`各阶段作品数:`, Object.fromEntries(
   Object.entries(poemCountPerPhase).sort((a, b) => a[0] - b[0])
 ))
+
+// ════════════════ 地名匹配（地理气泡图用）════════════════
+const placeNamesFile = resolve(DATA_DIR, 'place_names.json')
+if (!existsSync(placeNamesFile)) {
+  console.log(`\n[地理] 未找到 ${placeNamesFile}，跳过地名匹配`)
+} else {
+  const placeDict = JSON.parse(readFileSync(placeNamesFile, 'utf-8'))
+  const sortedPlaces = Object.entries(placeDict)
+    .map(([name, coords]) => ({ name, lng: coords[0], lat: coords[1] }))
+    .sort((a, b) => b.name.length - a.name.length)
+
+  const geoByPhase = {}
+  let geoMatches = 0
+
+  for (const r of records) {
+    const phase = r['创作阶段']
+    if (phase == null) continue
+    const imageries = r['意象_llm'] || []
+    if (imageries.length === 0) continue
+
+    const matched = new Set()
+    for (const img of imageries) {
+      for (const p of sortedPlaces) {
+        if (img.includes(p.name)) {
+          matched.add(p.name)
+        }
+      }
+    }
+    if (matched.size === 0) continue
+
+    geoByPhase[phase] ??= {}
+    for (const placeName of matched) {
+      geoByPhase[phase][placeName] = (geoByPhase[phase][placeName] || 0) + 1
+      geoMatches++
+    }
+  }
+
+  const placeCoords = {}
+  for (const p of sortedPlaces) {
+    placeCoords[p.name] = [p.lng, p.lat]
+  }
+
+  writeFileSync(resolve(OUTPUT_DIR, 'geo_by_phase.json'),
+    JSON.stringify({ by_phase: geoByPhase, place_coords: placeCoords }))
+
+  const phasesWithData = Object.keys(geoByPhase).sort((a, b) => a - b)
+  console.log(`\n[地理] 匹配 ${geoMatches} 次, ${phasesWithData.length} 个阶段有数据, 写入 geo_by_phase.json`)
+}
