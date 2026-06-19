@@ -87,10 +87,21 @@ function normalize(byPhase) {
   return result
 }
 
-function toRiverData(byPhase) {
+// 自定义排列顺序（决定河流图上下层级）
+const TYPE_ORDER = ['家国', '豪迈', '哲思', '离愁', '思乡', '孤独', '爱情', '闲适']
+const THEME_ORDER = ['家国兴亡', '边塞战争', '羁旅行役', '咏史怀古', '悼亡伤逝',
+  '送别酬赠', '人生哲理', '山水田园', '闺情爱情', '宴饮闲适', '咏物', '其他']
+
+function toRiverData(byPhase, order) {
   const rows = []
   for (const [phase, cats] of Object.entries(byPhase)) {
-    for (const [cat, value] of Object.entries(cats)) {
+    // 按自定义顺序排序
+    const sorted = Object.entries(cats).sort((a, b) => {
+      const ai = order.indexOf(a[0])
+      const bi = order.indexOf(b[0])
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi)
+    })
+    for (const [cat, value] of sorted) {
       rows.push([Number(phase), value, cat])
     }
   }
@@ -100,8 +111,8 @@ function toRiverData(byPhase) {
 const typesNormalized = normalize(typesByPhase)
 const themesNormalized = normalize(themesByPhase)
 
-const typesRiver = toRiverData(typesNormalized)
-const themesRiver = toRiverData(themesNormalized)
+const typesRiver = toRiverData(typesNormalized, TYPE_ORDER)
+const themesRiver = toRiverData(themesNormalized, THEME_ORDER)
 
 writeFileSync(resolve(OUTPUT_DIR, 'types_by_phase.json'), JSON.stringify(typesRiver))
 writeFileSync(resolve(OUTPUT_DIR, 'themes_by_phase.json'), JSON.stringify(themesRiver))
