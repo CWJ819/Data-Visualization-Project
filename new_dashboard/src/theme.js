@@ -37,22 +37,22 @@ export const RIVER_COLORS = [
 ]
 
 export const TREND_COLORS = [
-  '#6F89A8',
-  '#8C6E63',
-  '#B39C7B',
-  '#9AA88D',
-  '#D8CDC1',
-  '#5F7897',
-  '#7D665F',
-  '#A98F75',
-  '#849478',
-  '#C8B7A6',
-  '#798EA4',
-  '#9A7A68',
-  '#BDA98C',
-  '#A7B49D',
-  '#6A625C',
-  '#CEC2B8',
+  '#4F6F8E',
+  '#7A5548',
+  '#9A825E',
+  '#7A8E6E',
+  '#B8A692',
+  '#3E5F7D',
+  '#6A4D44',
+  '#8E7555',
+  '#6B7A5A',
+  '#A8907A',
+  '#5B708A',
+  '#7F5F4E',
+  '#A38B6E',
+  '#8A9B7C',
+  '#584E44',
+  '#B0A290',
 ]
 
 export const WORD_COLORS = [

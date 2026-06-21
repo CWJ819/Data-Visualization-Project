@@ -16,6 +16,20 @@ export default function ThemeRiver({ data }) {
 
     const seriesData = data.map(d => [d[0], d[1], d[2]])
 
+    const categories = [...new Set(seriesData.map(d => d[2]))]
+
+    const graphic = categories.map((name, i) => ({
+      type: 'text',
+      left: 4,
+      top: 8 + (i / categories.length) * 90 + '%',
+      style: {
+        text: name,
+        fill: COLORS.ink,
+        font: '500 9px sans-serif',
+      },
+      z: 100,
+    }))
+
     return {
       backgroundColor: 'transparent',
       tooltip: {
@@ -36,7 +50,6 @@ export default function ThemeRiver({ data }) {
         min: 1,
         max: 12,
         interval: 1,
-        bottom: 60,
         axisLabel: {
           color: COLORS.stoneBlue,
           fontSize: 9,
@@ -47,10 +60,12 @@ export default function ThemeRiver({ data }) {
           },
         },
       },
+      graphic,
       series: [{
         type: 'themeRiver',
         data: seriesData,
         color: RIVER_COLORS,
+        label: { show: false },
         itemStyle: {
           opacity: 0.78,
         },
