@@ -8,14 +8,27 @@ const PHASE_NAMES = [
   '北宋中期', '北宋晚期', '宋易代转折期', '南宋中后期',
 ]
 
-// 每个阶段对应一个代表年份（仅用于 ThemeRiver 时间轴定位）
 const PHASE_YEARS = [713, 750, 765, 790, 820, 870, 935, 1010, 1070, 1115, 1145, 1220]
+
+const CATEGORIES = ['豪迈', '家国', '哲思', '离愁', '思乡', '孤独', '爱情', '闲适']
 
 export default function TypeRiver({ data }) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return null
 
     const seriesData = data.map(d => [d[0], d[1], d[2]])
+
+    const graphic = CATEGORIES.map((name, i) => ({
+      type: 'text',
+      left: 4,
+      top: 10 + (i / CATEGORIES.length) * 88 + '%',
+      style: {
+        text: name,
+        fill: COLORS.ink,
+        font: '500 10px sans-serif',
+      },
+      z: 100,
+    }))
 
     return {
       backgroundColor: 'transparent',
@@ -37,7 +50,6 @@ export default function TypeRiver({ data }) {
         min: 1,
         max: 12,
         interval: 1,
-        bottom: 60,
         axisLabel: {
           color: COLORS.stoneBlue,
           fontSize: 9,
@@ -48,10 +60,12 @@ export default function TypeRiver({ data }) {
           },
         },
       },
+      graphic,
       series: [{
         type: 'themeRiver',
         data: seriesData,
         color: RIVER_COLORS.slice(0, 8),
+        label: { show: false },
         itemStyle: {
           opacity: 0.78,
         },
