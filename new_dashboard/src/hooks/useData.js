@@ -31,21 +31,28 @@ export function useData(url) {
   return { data, error }
 }
 
-export function useImageryFiltered(byPhase, range) {
+export function useImageryFiltered(byPhase, phase) {
   return useMemo(() => {
-    if (!byPhase || !range) return []
-    const [min, max] = range
-    const merged = {}
-    for (let p = min; p <= max; p++) {
-      const entries = byPhase[String(p)]
-      if (!entries) continue
-      for (const [word, count] of Object.entries(entries)) {
-        merged[word] = (merged[word] || 0) + count
+    if (!byPhase) return []
+    if (phase == null) {
+      const merged = {}
+      for (let p = 1; p <= 12; p++) {
+        const entries = byPhase[String(p)]
+        if (!entries) continue
+        for (const [word, count] of Object.entries(entries)) {
+          merged[word] = (merged[word] || 0) + count
+        }
       }
+      return Object.entries(merged)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 50)
+        .map(([name, value]) => ({ name, value }))
     }
-    return Object.entries(merged)
+    const entries = byPhase[String(phase)]
+    if (!entries) return []
+    return Object.entries(entries)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 50)
       .map(([name, value]) => ({ name, value }))
-  }, [byPhase, range])
+  }, [byPhase, phase])
 }

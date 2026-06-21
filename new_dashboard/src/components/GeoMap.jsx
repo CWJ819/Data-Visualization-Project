@@ -4,7 +4,7 @@ import { COLORS } from '../theme.js'
 
 let chinaRegistered = false
 
-export default function GeoMap({ data, range }) {
+export default function GeoMap({ data, selectedPhase }) {
   const containerRef = useRef(null)
   const chartRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
@@ -31,21 +31,29 @@ export default function GeoMap({ data, range }) {
   }, [])
 
   const option = useMemo(() => {
-    if (!mapReady || !data || !range) {
-      console.log('[GeoMap] 暂未就绪:', { mapReady, hasData: !!data, hasRange: !!range })
+    if (!mapReady || !data) {
+      console.log('[GeoMap] 暂未就绪:', { mapReady, hasData: !!data })
       return null
     }
 
     const byPhase = data.by_phase
     const coords = data.place_coords
-    const [min, max] = range
 
     const merged = {}
-    for (let p = min; p <= max; p++) {
-      const phaseData = byPhase[String(p)]
-      if (!phaseData) continue
-      for (const [place, count] of Object.entries(phaseData)) {
-        merged[place] = (merged[place] || 0) + count
+    if (selectedPhase != null) {
+      const phaseData = byPhase[String(selectedPhase)]
+      if (phaseData) {
+        for (const [place, count] of Object.entries(phaseData)) {
+          merged[place] = (merged[place] || 0) + count
+        }
+      }
+    } else {
+      for (let p = 1; p <= 12; p++) {
+        const phaseData = byPhase[String(p)]
+        if (!phaseData) continue
+        for (const [place, count] of Object.entries(phaseData)) {
+          merged[place] = (merged[place] || 0) + count
+        }
       }
     }
 
@@ -120,7 +128,7 @@ export default function GeoMap({ data, range }) {
         },
       }],
     }
-  }, [data, range, mapReady])
+  }, [data, selectedPhase, mapReady])
 
   // 初始化图表
   useEffect(() => {

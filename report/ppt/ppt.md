@@ -62,38 +62,41 @@
 **数据管道**（Python + LLM）：
 
 原始语料（全唐诗/全宋词/五代词, 约 7.9 万首）
-  → ingest.py 清洗、繁简统一、定年
-  → enrich_llm.py（DeepSeek, 8 线程并发, 温度 0.1）
-  → rep.jsonl（4.3 万首高质量精选）
-  → enriched.jsonl（609 首名篇的 LLM 精细标注）
+  → ingest.py 清洗、繁简统一、定年 → poems.jsonl（标准语料, 含可定年标记）
+  → enrich_llm.py（DeepSeek, 16 线程并发, 温度 0.1）
+     scope=stars 时约 600 首名篇, scope=representative 时可到 4.3 万首
+  → enriched.jsonl（LLM 精细标注: 极性/类型/题材/意象/创作阶段）
 
 **预处理层**（Node.js 脚本）：
 
-enriched_temp.jsonl → preprocess.js → 聚合 JSON（按 12 阶段 × 类别）
+data/enriched_temp.jsonl → preprocess.js → public/data/*.json（按 12 阶段 × 类别预聚合）
   - types_by_phase.json（8 情感类型 × 12 阶段, 归一化到 100%）
   - themes_by_phase.json（12 题材 × 12 阶段, 归一化到 100%）
   - imagery_by_phase.json（词云用, 按阶段索引）
   - geo_by_phase.json（地名匹配, 按阶段聚合）
+  - imagery_trend.json（10 组意象关键词在各阶段的归一化频次, 折线图用）
 
-所有聚合工作在离线完成, 前端只加载极小的预计算结果, 因此即使数据量扩展到 4 万条, 浏览器端性能也不受影响。
+所有聚合工作在离线完成, 前端只加载极小的预计算结果, 浏览器端性能不受影响。
 
 **前端**（React 18 + Vite 6 + ECharts 5）：
 
 ```
 new_dashboard/
 ├── src/
-│   ├── App.jsx              # 主布局: 左 2/3 河流图 + 右 1/3 地图/词云
+│   ├── App.jsx              # 主布局: 左侧滑条 + 中部河流图/折线 + 右侧地图/词云
 │   ├── components/
 │   │   ├── TypeRiver.jsx     # 情感类型河流图（ThemeRiver）
 │   │   ├── ThemeRiver.jsx    # 题材分类河流图（ThemeRiver）
+│   │   ├── TrendLine.jsx     # 意象变化折线图（Line, 多系列）
 │   │   ├── GeoMap.jsx        # 地理气泡图（Geo + Scatter）
 │   │   ├── WordCloud.jsx     # 意象词云（echarts-wordcloud）
-│   │   ├── RangeSlider.jsx   # 双头滑条（1–12 阶段选区）
+│   │   ├── StageSelector.jsx # 竖向单选滑条（1–12 阶段, 悬停选中/取消）
 │   │   └── ChartBox.jsx      # ECharts 通用容器（ResizeObserver）
-│   ├── hooks/useData.js      # 数据加载 + 区间合并
-│   └── charts.js             # 统一 ECharts 实例（含 ThemeRiver/Geo 注册）
+│   ├── hooks/useData.js      # 数据加载 + 单阶段/全量过滤
+│   └── charts.js             # 统一 ECharts 实例（CDN 加载, 含 ThemeRiver/Geo 注册）
 └── data/
     ├── enriched_temp.jsonl   # LLM 标注结果
+    ├── imagery_groups.json   # 10 组意象关键词（折线图用）
     └── place_names.json      # 116 个地名坐标表（可扩充）
 ```
 
@@ -105,15 +108,19 @@ x 轴使用 `singleAxis.type = 'value'`, 以阶段序号 1–12 为刻度, forma
 
 **2. 地理气泡图（Geo + Scatter）**
 
-使用 DataV 的 china.json 地图底图（35 省, GeoJSON FeatureCollection）。地名坐标表（place_names.json, 当前 116 条）在预处理时与 LLM 意象字段进行子串匹配（如"长安月"匹配"长安"）。前端根据滑条选区合并多个阶段的地名频次, 气泡大小 = sqrt(count / max) × 40 + 8。配色沿用莫兰迪色系。
+使用 DataV 的 china.json 地图底图（35 省, GeoJSON FeatureCollection）。地名坐标表（place_names.json, 当前 116 条）在预处理时与 LLM 意象字段进行子串匹配（如"长安月"匹配"长安"）。气泡根据选中阶段实时渲染（单选单阶段数据, 或合并全部阶段）, 气泡大小 = sqrt(count / max) × 40 + 8。配色沿用莫兰迪色系。
 
 **3. 意象词云（echarts-wordcloud）**
 
-与地理图共用滑条选区, 合并选中阶段的意象频次字典, 取 Top 50 渲染。词云容器采用 ResizeObserver 检测尺寸 + 重建图表的方式, 确保 wordcloud2.js 布局算法始终在正确尺寸上执行。
+与地理图共用滑条状态, 读取选中阶段的意象频次字典, 取 Top 50 渲染。词云容器采用 ResizeObserver 检测尺寸 + 重建图表的方式, 确保 wordcloud2.js 布局算法始终在正确尺寸上执行。点击词云中的意象词会同时更新折线图的选中系列。
 
-**4. 滑条联动机制**
+**4. 意象变化折线图（Line）**
 
-RangeSlider 输出 `[min, max]` 区间值 → 河流图高亮命中区域 → 地理图和词云重新合并该区间内的阶段数据 → 实时更新。所有组件共用同一份 range 状态, 无需额外同步。
+选取 10 组代表性意象关键词（烽火/沙场/西湖/落花/夕阳/梅/梧桐芭蕉/烟雨/楼/白骨）, 按阶段统计每百首出现频次。左侧 legend 可切换显示/隐藏各系列, 初始全部隐藏；点击词云中的意象词会联动显示对应折线。图中有两道 markLine 标记安史之乱和靖康之变的阶段位置。
+
+**5. 滑条联动机制**
+
+StageSelector 输出单个 `selectedPhase`（1–12）或 `null`（全部阶段）→ 地理图和词云根据该值过滤数据 → 实时更新。所有组件共用同一份 phase 状态, 无需额外同步。
 
 ## 分工总结
 

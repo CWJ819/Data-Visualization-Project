@@ -24,7 +24,6 @@ const PHASE_LABELS = [
 ]
 
 const EVENT_LINE_COLOR = '#A94B3D'
-const DEFAULT_VISIBLE_COUNT = 5
 
 export default function TrendLine({ data, selectedImagery = [] }) {
   const option = useMemo(() => {
@@ -32,20 +31,10 @@ export default function TrendLine({ data, selectedImagery = [] }) {
 
     const groups = Object.keys(data)
     const activeSelected = selectedImagery.filter(group => groups.includes(group))
-    const visibleGroups = [...groups]
-      .sort((a, b) => {
-        const sumA = Object.values(data[a]).reduce((sum, v) => sum + Number(v || 0), 0)
-        const sumB = Object.values(data[b]).reduce((sum, v) => sum + Number(v || 0), 0)
-        return sumB - sumA
-      })
-      .slice(0, DEFAULT_VISIBLE_COUNT)
-    const groupsToShow = activeSelected.length > 0 ? activeSelected : visibleGroups
+    const hasSelection = activeSelected.length > 0
+    const groupsToShow = hasSelection ? activeSelected : groups
 
-    const legendSelected = Object.fromEntries(
-      groups.map(group => [group, groupsToShow.includes(group)])
-    )
-
-    const series = groups.map((group, i) => ({
+    const series = groupsToShow.map((group, i) => ({
       name: group,
       type: 'line',
       data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(p =>
@@ -55,21 +44,24 @@ export default function TrendLine({ data, selectedImagery = [] }) {
       symbol: 'circle',
       symbolSize: 5,
       showSymbol: false,
-      lineStyle: { width: 2.25 },
+      lineStyle: { width: 2.5 },
+      itemStyle: { color: TREND_COLORS[i % TREND_COLORS.length] },
       emphasis: {
         focus: 'series',
-        lineStyle: { width: 3 },
+        lineStyle: { width: 3.5 },
       },
     }))
+
+    const legendSelected = Object.fromEntries(
+      groupsToShow.map(group => [group, hasSelection])
+    )
 
     return {
       backgroundColor: 'transparent',
       legend: {
-        data: groups,
-        top: 4,
+        data: groupsToShow,
         selected: legendSelected,
-        selectedMode: 'multiple',
-        inactiveColor: 'rgba(108,98,86,0.28)',
+        top: 4,
         textStyle: { color: COLORS.ink, fontSize: 10 },
         type: 'scroll',
       },
@@ -112,10 +104,7 @@ export default function TrendLine({ data, selectedImagery = [] }) {
         splitLine: { lineStyle: { color: 'rgba(120,100,60,0.14)' } },
       },
       series: [
-        ...series.map((s, i) => ({
-          ...s,
-          itemStyle: { color: TREND_COLORS[i % TREND_COLORS.length] },
-        })),
+        ...series,
         {
           name: '__historical_events__',
           type: 'line',
