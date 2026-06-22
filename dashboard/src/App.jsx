@@ -23,16 +23,18 @@ export default function App() {
   const { data: imageryData } = useData('/data/imagery_by_phase.json')
   const { data: geoData } = useData('/data/geo_by_phase.json')
   const { data: trendData } = useData('/data/imagery_trend.json')
+  const { data: imageryAliases } = useData('/data/imagery_group_aliases.json')
 
   const filteredImagery = useImageryFiltered(imageryData, selectedPhase)
 
   const toggleImagery = useCallback((name) => {
+    const groupName = imageryAliases?.[name] ?? name
     setSelectedImagery(prev => {
-      if (prev.includes(name)) return prev.filter(item => item !== name)
-      if (prev.length < 2) return [...prev, name]
-      return [prev[1], name]
+      if (prev.includes(groupName)) return prev.filter(item => item !== groupName)
+      if (prev.length < 2) return [...prev, groupName]
+      return [prev[1], groupName]
     })
-  }, [])
+  }, [imageryAliases])
 
   return (
     <div className="app">

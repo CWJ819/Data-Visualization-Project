@@ -207,6 +207,14 @@ if (!existsSync(groupsFile)) {
     groupName,
     keywords.map(normalizeImageryForMatch),
   ])
+  const groupAliases = {}
+  for (const [groupName, keywords] of groups) {
+    groupAliases[groupName] = groupName
+    for (const keyword of keywords) {
+      groupAliases[keyword] = groupName
+      groupAliases[normalizeImageryForMatch(keyword)] = groupName
+    }
+  }
 
   // 对每组关键词，按阶段统计出现次数（归一化到 per_100）
   const trendByPhase = {}
@@ -240,5 +248,6 @@ if (!existsSync(groupsFile)) {
   }
 
   writeFileSync(resolve(OUTPUT_DIR, 'imagery_trend.json'), JSON.stringify(trendOutput))
-  console.log(`\n[趋势] ${Object.keys(trendOutput).length} 组意象趋势, 写入 imagery_trend.json`)
+  writeFileSync(resolve(OUTPUT_DIR, 'imagery_group_aliases.json'), JSON.stringify(groupAliases))
+  console.log(`\n[趋势] ${Object.keys(trendOutput).length} 组意象趋势, 写入 imagery_trend.json / imagery_group_aliases.json`)
 }
