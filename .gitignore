@@ -11,15 +11,10 @@ requiremets.md
 image/
 
 # ── 前端构建产物 ──────────────────────────────────────
-dashboard/web/node_modules/
-dashboard/web/dist/
-dashboard/web/.vite/
-
-new_dashboard/node_modules/
-new_dashboard/dist/
-new_dashboard/.vite/
-new_dashboard/src/*.log
-
+dashboard/node_modules/
+dashboard/dist/
+dashboard/.vite/
+dashboard/*.log
 dashboard/data/
 
 # ── Python ──────────────────────────────────────────
