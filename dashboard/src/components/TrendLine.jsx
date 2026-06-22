@@ -64,6 +64,22 @@ export default function TrendLine({ data, selectedImagery = [] }) {
         top: 4,
         textStyle: { color: COLORS.ink, fontSize: 10 },
         type: 'scroll',
+        pageIcons: {
+          horizontal: [
+            'M8,1 L3,6 L8,11 L6.7,12 L1,6 L6.7,0 Z',
+            'M3,1 L8,6 L3,11 L4.3,12 L10,6 L4.3,0 Z',
+          ],
+        },
+        pageIconColor: COLORS.ochreDeep,
+        pageIconInactiveColor: 'rgba(120, 100, 60, 0.22)',
+        pageIconSize: 12,
+        pageButtonItemGap: 5,
+        pageButtonGap: 8,
+        pageTextStyle: {
+          color: COLORS.inkSoft,
+          fontSize: 10,
+          fontFamily: 'KaiTi, STKaiti, serif',
+        },
       },
       tooltip: {
         trigger: 'axis',
